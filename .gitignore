@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.env
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+out-tsc/
+
+# Editors
+.vscode/
+.idea/
+.DS_Store
