@@ -2,12 +2,14 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from app import __version__
 from app.config import Settings, get_settings
-from app.db import Database
+from app.container import Container, build_container
+from app.routes import router
 
 log = logging.getLogger("filinglens")
 
@@ -17,17 +19,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        db = Database(settings.database_url) if settings.database_url else None
-        if db is None:
-            log.warning("FILINGLENS_DATABASE_URL is not set; the API will report not ready")
-        else:
-            await db.open()
-        app.state.db = db
+        container = await run_in_threadpool(build_container, settings)
+        app.state.container = container
         try:
             yield
         finally:
-            if db is not None:
-                await db.close()
+            await run_in_threadpool(container.close)
 
     app = FastAPI(
         title="FilingLens API",
@@ -39,18 +36,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     @app.get("/api/health")
-    async def health() -> dict[str, str]:
+    def health() -> dict[str, str]:
         """Liveness: the process is up. Never touches the database."""
         return {"status": "ok", "version": __version__}
 
     @app.get("/api/health/ready")
-    async def ready(request: Request) -> JSONResponse:
-        """Readiness: the database answers and pgvector is enabled."""
-        db: Database | None = request.app.state.db
-        if db is None:
+    def ready() -> JSONResponse:
+        """Readiness: Postgres answers and pgvector is enabled."""
+        container: Container = app.state.container
+        if not container.persistent:
             return _unavailable("not configured")
         try:
-            version = await db.pgvector_version()
+            version = container.store.pgvector_version()  # type: ignore[attr-defined]
         except Exception:
             log.exception("readiness check failed")
             return _unavailable("unreachable")
@@ -58,6 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return _unavailable("pgvector missing")
         return JSONResponse({"status": "ready", "database": "ok", "pgvector": version})
 
+    app.include_router(router)
     return app
 
 
