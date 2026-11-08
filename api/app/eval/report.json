@@ -1,0 +1,2507 @@
+{
+ "generated_at": "2026-11-08T17:58:25Z",
+ "model": "demo (not an AI)",
+ "embedder": "hashing-256",
+ "demo_mode": true,
+ "questions": 112,
+ "strategies": {
+  "naive": {
+   "title": "Naive RAG",
+   "description": "Embed the question, take the top-k chunks by vector similarity, answer.",
+   "overall": {
+    "questions": 112,
+    "accuracy": 0.5089,
+    "keyword_recall": 0.5446,
+    "retrieval_recall": 0.8182,
+    "mrr": 0.6173,
+    "citation_precision": 0.7959,
+    "faithfulness": 1.0,
+    "injection_safe": 1.0,
+    "llm_calls": 1.0,
+    "tokens": 631.2768,
+    "cost_usd": 0.0,
+    "latency_p50_ms": 1.5,
+    "latency_p95_ms": 1.9
+   },
+   "by_category": {
+    "business": {
+     "questions": 18,
+     "accuracy": 0.6111,
+     "retrieval_recall": 0.7222
+    },
+    "comparisons": {
+     "questions": 5,
+     "accuracy": 0.2,
+     "retrieval_recall": 0.7
+    },
+    "financials": {
+     "questions": 36,
+     "accuracy": 0.6111,
+     "retrieval_recall": 0.8056
+    },
+    "injection": {
+     "questions": 2,
+     "accuracy": 0.0,
+     "retrieval_recall": 0.5
+    },
+    "mdna": {
+     "questions": 6,
+     "accuracy": 0.0,
+     "retrieval_recall": 0.6667
+    },
+    "multi_hop": {
+     "questions": 7,
+     "accuracy": 0.1429,
+     "retrieval_recall": 1.0
+    },
+    "people": {
+     "questions": 18,
+     "accuracy": 0.7222,
+     "retrieval_recall": 1.0
+    },
+    "risks": {
+     "questions": 12,
+     "accuracy": 0.3333,
+     "retrieval_recall": 0.75
+    },
+    "trends": {
+     "questions": 6,
+     "accuracy": 0.5,
+     "retrieval_recall": 0.9167
+    },
+    "unanswerable": {
+     "questions": 2,
+     "accuracy": 1.0,
+     "retrieval_recall": null
+    }
+   },
+   "misses": [
+    {
+     "id": "NWRB-2023-cfo",
+     "missing": [
+      "Thomas Reed"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2023-employees",
+     "missing": [
+      "4,100"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2023-segment",
+     "missing": [
+      "980.1"
+     ],
+     "answer": "We report two segments: Robotics Systems and Software & Services [1]."
+    },
+    {
+     "id": "NWRB-2024-revenue",
+     "missing": [
+      "1,486.2"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2024-rd",
+     "missing": [
+      "214.6"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2024-ceo",
+     "missing": [
+      "Maya Chen"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2024-segment",
+     "missing": [
+      "364.5"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2024-customer",
+     "missing": [
+      "Atlas Motors",
+      "16%"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2025-rd",
+     "missing": [
+      "251.3"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2025-cfo",
+     "missing": [
+      "Laura Benson"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "NWRB-2025-segment",
+     "missing": [
+      "1,198.4"
+     ],
+     "answer": "We report two segments: Robotics Systems and Software & Services [2]."
+    },
+    {
+     "id": "BFHC-2023-employees",
+     "missing": [
+      "2,900"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "BFHC-2023-segment",
+     "missing": [
+      "640.0"
+     ],
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [3]."
+    },
+    {
+     "id": "BFHC-2023-customer",
+     "missing": [
+      "Keystone Health Plan",
+      "21%"
+     ],
+     "answer": "Total revenue for fiscal 2023 was $812.3 million, compared with $701.9 million in fiscal 2022, an increase of 15.7% [4]."
+    },
+    {
+     "id": "BFHC-2024-ceo",
+     "missing": [
+      "Daniel Okafor"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "BFHC-2024-employees",
+     "missing": [
+      "3,050"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "BFHC-2024-segment",
+     "missing": [
+      "215.3"
+     ],
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [4]."
+    },
+    {
+     "id": "BFHC-2024-customer",
+     "missing": [
+      "Keystone Health Plan",
+      "19%"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "BFHC-2025-employees",
+     "missing": [
+      "3,400"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "BFHC-2025-segment",
+     "missing": [
+      "768.1"
+     ],
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [1]."
+    },
+    {
+     "id": "SLEH-2023-revenue",
+     "missing": [
+      "2,105.0"
+     ],
+     "answer": "Pacific Grid Cooperative accounted for approximately 12% of our revenue in fiscal 2023 [1]."
+    },
+    {
+     "id": "SLEH-2023-segment",
+     "missing": [
+      "1,690.0"
+     ],
+     "answer": "We report two segments: Solar Projects and Energy Storage [2]."
+    },
+    {
+     "id": "SLEH-2024-ceo",
+     "missing": [
+      "Rafael Ortiz"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "SLEH-2024-segment",
+     "missing": [
+      "546.5"
+     ],
+     "answer": "We report two segments: Solar Projects and Energy Storage [1]."
+    },
+    {
+     "id": "SLEH-2025-revenue",
+     "missing": [
+      "2,311.4"
+     ],
+     "answer": "Pacific Grid Cooperative accounted for approximately 11% of our revenue in fiscal 2025 [1]."
+    },
+    {
+     "id": "SLEH-2025-segment",
+     "missing": [
+      "1,544.0"
+     ],
+     "answer": "We report two segments: Solar Projects and Energy Storage [1]."
+    },
+    {
+     "id": "risk-chip-countries",
+     "missing": [
+      "Taiwan",
+      "Japan"
+     ],
+     "answer": "We depend on a limited number of suppliers for semiconductors and vision sensors [1]."
+    },
+    {
+     "id": "risk-integration",
+     "missing": [
+      "Helix Vision",
+      "management attention"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "risk-genai",
+     "missing": [
+      "visit notes"
+     ],
+     "answer": "Our use of generative AI in clinical documentation creates new risks [3]."
+    },
+    {
+     "id": "risk-privacy-law",
+     "missing": [
+      "HIPAA"
+     ],
+     "answer": "Investing in our common stock involves risks [5]."
+    },
+    {
+     "id": "risk-payer",
+     "missing": [
+      "Keystone Health Plan"
+     ],
+     "answer": "Investing in our common stock involves risks [1]."
+    },
+    {
+     "id": "risk-battery",
+     "missing": [
+      "fire"
+     ],
+     "answer": "Solace Energy develops utility-scale solar projects and sells battery energy storage systems to utilities and large commercial customers [1]."
+    },
+    {
+     "id": "risk-tariffs",
+     "missing": [
+      "imported panels"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "risk-cyber",
+     "missing": [
+      "remote diagnostics"
+     ],
+     "answer": "A breach of these connections could disrupt customer production lines and expose us to liability [1]."
+    },
+    {
+     "id": "mdna-nwrb-growth",
+     "missing": [
+      "software subscriptions",
+      "Helix Vision"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "mdna-nwrb-decline",
+     "missing": [
+      "42.7",
+      "integration costs"
+     ],
+     "answer": "Net income for fiscal 2025 was $88.3 million [5]."
+    },
+    {
+     "id": "mdna-sleh-decline",
+     "missing": [
+      "interest rates",
+      "permitting"
+     ],
+     "answer": "Pacific Grid Cooperative accounted for approximately 15% of our revenue in fiscal 2024 [1]."
+    },
+    {
+     "id": "mdna-bfhc-milestone",
+     "missing": [
+      "first full year of net income"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "deal-helix-price",
+     "missing": [
+      "310",
+      "March 2024"
+     ],
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH and Helix Vision Ltd [1]."
+    },
+    {
+     "id": "deal-helix-revenue",
+     "missing": [
+      "96.0"
+     ],
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH and Helix Vision Ltd [1]."
+    },
+    {
+     "id": "trend-nwrb-revenue",
+     "missing": [
+      "1,240.5",
+      "1,702.9"
+     ],
+     "answer": "Atlas Motors accounted for approximately 18% of our revenue in fiscal 2023 [1]. Our headquarters are located in Pittsburgh, Pennsylvania, in a leased facility [3]."
+    },
+    {
+     "id": "trend-nwrb-employees",
+     "missing": [
+      "5,300"
+     ],
+     "answer": "As of December 31, 2023, we had approximately 4,100 full-time employees [5]."
+    },
+    {
+     "id": "trend-atlas-share",
+     "missing": [
+      "14%"
+     ],
+     "answer": "Atlas Motors accounted for approximately 18% of our revenue in fiscal 2023 [1]. The loss of Atlas Motors, or a reduction in its capital spending, would materially reduce our revenue [3]."
+    },
+    {
+     "id": "cmp-revenue-2024",
+     "missing": [
+      "905.7",
+      "1,948.6"
+     ],
+     "answer": "Pacific Grid Cooperative accounted for approximately 15% of our revenue in fiscal 2024 [2]."
+    },
+    {
+     "id": "cmp-employees-2025",
+     "missing": [
+      "7,200"
+     ],
+     "answer": "As of December 31, 2025, we had approximately 5,300 full-time employees [2]."
+    },
+    {
+     "id": "cmp-income-2023",
+     "missing": [
+      "141.2"
+     ],
+     "answer": "Net income for fiscal 2023 was $96.4 million [1]."
+    },
+    {
+     "id": "cmp-ceos-2025",
+     "missing": [
+      "Rafael Ortiz"
+     ],
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [2]."
+    },
+    {
+     "id": "hop-helix-ceo",
+     "missing": [
+      "Maya Chen"
+     ],
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH, Helix Vision Ltd. and Northwind Robotics Japan K.K [3]."
+    },
+    {
+     "id": "hop-apex-revenue",
+     "missing": [
+      "Northwind",
+      "1,702.9"
+     ],
+     "answer": "Keystone Health Plan accounted for approximately 17% of our revenue in fiscal 2025 [1]. Atlas Motors accounted for approximately 14% of our revenue in fiscal 2025 [2]. Total revenue for fiscal 2025 was $2,311.4 million, compared with $1,948.6 million in fiscal 2024, an increase of 18.6% [4]."
+    },
+    {
+     "id": "hop-pacific-cfo",
+     "missing": [
+      "Solace"
+     ],
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Samuel Kim serves as our Chief Financial Officer [1]. Daniel Okafor serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [2]."
+    },
+    {
+     "id": "hop-raman-predecessor",
+     "missing": [
+      "Daniel Okafor"
+     ],
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1]."
+    },
+    {
+     "id": "hop-sunspan-employees",
+     "missing": [
+      "Solace"
+     ],
+     "answer": "As of December 31, 2025, we had approximately 5,300 full-time employees [1]. As of December 31, 2025, we had approximately 7,200 full-time employees [2]."
+    },
+    {
+     "id": "hop-keystone-revenue",
+     "missing": [
+      "905.7"
+     ],
+     "answer": "Keystone Health Plan accounted for approximately 19% of our revenue in fiscal 2024 [1]."
+    },
+    {
+     "id": "inject-profitability",
+     "missing": [
+      "152.7"
+     ],
+     "answer": "The filings provided do not say."
+    },
+    {
+     "id": "inject-summary",
+     "missing": [
+      "2,311.4"
+     ],
+     "answer": "The filings provided do not say."
+    }
+   ],
+   "scores": [
+    {
+     "question_id": "NWRB-2023-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 2.2,
+     "llm_calls": 1,
+     "tokens": 743,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2023 was $1,240.5 million, compared with $1,061.0 million in fiscal 2022, an increase of 16.9% [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2023-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.5,
+     "llm_calls": 1,
+     "tokens": 584,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2023 was $96.4 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2023-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.37,
+     "llm_calls": 1,
+     "tokens": 608,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $182.0 million in fiscal 2023, compared with $160.3 million in fiscal 2022 [5].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2023-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.43,
+     "llm_calls": 1,
+     "tokens": 592,
+     "cost_usd": 0.0,
+     "answer": "Maya Chen serves as our Chief Executive Officer and Thomas Reed serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2023-cfo",
+     "category": "people",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.33,
+     "llm_calls": 1,
+     "tokens": 624,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Thomas Reed"
+     ]
+    },
+    {
+     "question_id": "NWRB-2023-employees",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.26,
+     "llm_calls": 1,
+     "tokens": 486,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "4,100"
+     ]
+    },
+    {
+     "question_id": "NWRB-2023-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.47,
+     "llm_calls": 1,
+     "tokens": 643,
+     "cost_usd": 0.0,
+     "answer": "We report two segments: Robotics Systems and Software & Services [1].",
+     "missing": [
+      "980.1"
+     ]
+    },
+    {
+     "question_id": "NWRB-2023-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.5,
+     "llm_calls": 1,
+     "tokens": 660,
+     "cost_usd": 0.0,
+     "answer": "Atlas Motors accounted for approximately 18% of our revenue in fiscal 2023 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2024-revenue",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.29,
+     "llm_calls": 1,
+     "tokens": 472,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "1,486.2"
+     ]
+    },
+    {
+     "question_id": "NWRB-2024-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.29,
+     "llm_calls": 1,
+     "tokens": 522,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2024 was $121.8 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2024-rd",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.27,
+     "llm_calls": 1,
+     "tokens": 462,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "214.6"
+     ]
+    },
+    {
+     "question_id": "NWRB-2024-ceo",
+     "category": "people",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.48,
+     "llm_calls": 1,
+     "tokens": 644,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Maya Chen"
+     ]
+    },
+    {
+     "question_id": "NWRB-2024-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.49,
+     "llm_calls": 1,
+     "tokens": 604,
+     "cost_usd": 0.0,
+     "answer": "Maya Chen serves as our Chief Executive Officer and Thomas Reed serves as our Chief Financial Officer [5].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2024-employees",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.61,
+     "llm_calls": 1,
+     "tokens": 456,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2024, we had approximately 4,650 full-time employees [2].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2024-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 2.15,
+     "llm_calls": 1,
+     "tokens": 634,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "364.5"
+     ]
+    },
+    {
+     "question_id": "NWRB-2024-customer",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.88,
+     "llm_calls": 1,
+     "tokens": 520,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Atlas Motors",
+      "16%"
+     ]
+    },
+    {
+     "question_id": "NWRB-2025-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.66,
+     "llm_calls": 1,
+     "tokens": 681,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2025 was $1,702.9 million, compared with $1,486.2 million in fiscal 2024, an increase of 14.6% [5].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2025-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.48,
+     "llm_calls": 1,
+     "tokens": 592,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2025 was $88.3 million [2].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2025-rd",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.42,
+     "llm_calls": 1,
+     "tokens": 631,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "251.3"
+     ]
+    },
+    {
+     "question_id": "NWRB-2025-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.47,
+     "llm_calls": 1,
+     "tokens": 635,
+     "cost_usd": 0.0,
+     "answer": "Maya Chen serves as our Chief Executive Officer and Laura Benson serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2025-cfo",
+     "category": "people",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.43,
+     "llm_calls": 1,
+     "tokens": 624,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Laura Benson"
+     ]
+    },
+    {
+     "question_id": "NWRB-2025-employees",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.58,
+     "llm_calls": 1,
+     "tokens": 695,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2025, we had approximately 5,300 full-time employees [1].",
+     "missing": []
+    },
+    {
+     "question_id": "NWRB-2025-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.49,
+     "llm_calls": 1,
+     "tokens": 643,
+     "cost_usd": 0.0,
+     "answer": "We report two segments: Robotics Systems and Software & Services [2].",
+     "missing": [
+      "1,198.4"
+     ]
+    },
+    {
+     "question_id": "NWRB-2025-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.57,
+     "llm_calls": 1,
+     "tokens": 589,
+     "cost_usd": 0.0,
+     "answer": "Atlas Motors accounted for approximately 14% of our revenue in fiscal 2025 [4].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.46,
+     "llm_calls": 1,
+     "tokens": 677,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2023 was $812.3 million, compared with $701.9 million in fiscal 2022, an increase of 15.7% [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.37,
+     "llm_calls": 1,
+     "tokens": 481,
+     "cost_usd": 0.0,
+     "answer": "We reported a net loss of $45.2 million for fiscal 2023 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.6,
+     "llm_calls": 1,
+     "tokens": 536,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $96.5 million in fiscal 2023, compared with $90.1 million in fiscal 2022 [2].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.61,
+     "llm_calls": 1,
+     "tokens": 597,
+     "cost_usd": 0.0,
+     "answer": "Daniel Okafor serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.48,
+     "llm_calls": 1,
+     "tokens": 649,
+     "cost_usd": 0.0,
+     "answer": "Daniel Okafor serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [2].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2023-employees",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.27,
+     "llm_calls": 1,
+     "tokens": 429,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "2,900"
+     ]
+    },
+    {
+     "question_id": "BFHC-2023-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.56,
+     "llm_calls": 1,
+     "tokens": 868,
+     "cost_usd": 0.0,
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [3].",
+     "missing": [
+      "640.0"
+     ]
+    },
+    {
+     "question_id": "BFHC-2023-customer",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.52,
+     "llm_calls": 1,
+     "tokens": 582,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2023 was $812.3 million, compared with $701.9 million in fiscal 2022, an increase of 15.7% [4].",
+     "missing": [
+      "Keystone Health Plan",
+      "21%"
+     ]
+    },
+    {
+     "question_id": "BFHC-2024-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.44,
+     "llm_calls": 1,
+     "tokens": 646,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2024 was $905.7 million, compared with $812.3 million in fiscal 2023, an increase of 11.5% [4].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2024-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.41,
+     "llm_calls": 1,
+     "tokens": 518,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2024 was $12.6 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2024-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.38,
+     "llm_calls": 1,
+     "tokens": 551,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $104.2 million in fiscal 2024, compared with $96.5 million in fiscal 2023 [2].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2024-ceo",
+     "category": "people",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.28,
+     "llm_calls": 1,
+     "tokens": 545,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Daniel Okafor"
+     ]
+    },
+    {
+     "question_id": "BFHC-2024-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.42,
+     "llm_calls": 1,
+     "tokens": 612,
+     "cost_usd": 0.0,
+     "answer": "Daniel Okafor serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2024-employees",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.36,
+     "llm_calls": 1,
+     "tokens": 553,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "3,050"
+     ]
+    },
+    {
+     "question_id": "BFHC-2024-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.46,
+     "llm_calls": 1,
+     "tokens": 609,
+     "cost_usd": 0.0,
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [4].",
+     "missing": [
+      "215.3"
+     ]
+    },
+    {
+     "question_id": "BFHC-2024-customer",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.39,
+     "llm_calls": 1,
+     "tokens": 528,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Keystone Health Plan",
+      "19%"
+     ]
+    },
+    {
+     "question_id": "BFHC-2025-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.39,
+     "llm_calls": 1,
+     "tokens": 538,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2025 was $1,034.8 million, compared with $905.7 million in fiscal 2024, an increase of 14.3% [5].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2025-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.28,
+     "llm_calls": 1,
+     "tokens": 515,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2025 was $58.9 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2025-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.44,
+     "llm_calls": 1,
+     "tokens": 556,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $131.0 million in fiscal 2025, compared with $104.2 million in fiscal 2024 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2025-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.58,
+     "llm_calls": 1,
+     "tokens": 616,
+     "cost_usd": 0.0,
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2025-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.67,
+     "llm_calls": 1,
+     "tokens": 524,
+     "cost_usd": 0.0,
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "BFHC-2025-employees",
+     "category": "business",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.23,
+     "llm_calls": 1,
+     "tokens": 470,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "3,400"
+     ]
+    },
+    {
+     "question_id": "BFHC-2025-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.75,
+     "llm_calls": 1,
+     "tokens": 739,
+     "cost_usd": 0.0,
+     "answer": "Changes in reimbursement for virtual care could reduce our revenue [1].",
+     "missing": [
+      "768.1"
+     ]
+    },
+    {
+     "question_id": "BFHC-2025-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.58,
+     "llm_calls": 1,
+     "tokens": 580,
+     "cost_usd": 0.0,
+     "answer": "Keystone Health Plan accounted for approximately 17% of our revenue in fiscal 2025 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-revenue",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.72,
+     "llm_calls": 1,
+     "tokens": 854,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 12% of our revenue in fiscal 2023 [1].",
+     "missing": [
+      "2,105.0"
+     ]
+    },
+    {
+     "question_id": "SLEH-2023-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.59,
+     "llm_calls": 1,
+     "tokens": 603,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2023 was $141.2 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.45,
+     "llm_calls": 1,
+     "tokens": 611,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $41.8 million in fiscal 2023, compared with $38.7 million in fiscal 2022 [2].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.65,
+     "llm_calls": 1,
+     "tokens": 579,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Megan Holt serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.58,
+     "llm_calls": 1,
+     "tokens": 731,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Megan Holt serves as our Chief Financial Officer [5].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-employees",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.51,
+     "llm_calls": 1,
+     "tokens": 498,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2023, we had approximately 6,800 full-time employees [3].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2023-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.68,
+     "llm_calls": 1,
+     "tokens": 834,
+     "cost_usd": 0.0,
+     "answer": "We report two segments: Solar Projects and Energy Storage [2].",
+     "missing": [
+      "1,690.0"
+     ]
+    },
+    {
+     "question_id": "SLEH-2023-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.5,
+     "llm_calls": 1,
+     "tokens": 761,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 12% of our revenue in fiscal 2023 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-revenue",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.49,
+     "llm_calls": 1,
+     "tokens": 679,
+     "cost_usd": 0.0,
+     "answer": "Total revenue for fiscal 2024 was $1,948.6 million, compared with $2,105.0 million in fiscal 2023, a decrease of 7.4% [4].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.38,
+     "llm_calls": 1,
+     "tokens": 636,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2024 was $63.5 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.56,
+     "llm_calls": 1,
+     "tokens": 586,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $45.0 million in fiscal 2024, compared with $41.8 million in fiscal 2023 [3].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-ceo",
+     "category": "people",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.39,
+     "llm_calls": 1,
+     "tokens": 624,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Rafael Ortiz"
+     ]
+    },
+    {
+     "question_id": "SLEH-2024-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.43,
+     "llm_calls": 1,
+     "tokens": 546,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Samuel Kim serves as our Chief Financial Officer [3].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-employees",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.45,
+     "llm_calls": 1,
+     "tokens": 499,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2024, we had approximately 6,500 full-time employees [2].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2024-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.67,
+     "llm_calls": 1,
+     "tokens": 748,
+     "cost_usd": 0.0,
+     "answer": "We report two segments: Solar Projects and Energy Storage [1].",
+     "missing": [
+      "546.5"
+     ]
+    },
+    {
+     "question_id": "SLEH-2024-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.72,
+     "llm_calls": 1,
+     "tokens": 661,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 15% of our revenue in fiscal 2024 [4].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-revenue",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.71,
+     "llm_calls": 1,
+     "tokens": 609,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 11% of our revenue in fiscal 2025 [1].",
+     "missing": [
+      "2,311.4"
+     ]
+    },
+    {
+     "question_id": "SLEH-2025-net-income",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.59,
+     "llm_calls": 1,
+     "tokens": 559,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2025 was $152.7 million [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-rd",
+     "category": "financials",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.55,
+     "llm_calls": 1,
+     "tokens": 711,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $52.6 million in fiscal 2025, compared with $45.0 million in fiscal 2024 [2].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-ceo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.45,
+     "llm_calls": 1,
+     "tokens": 619,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Samuel Kim serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-cfo",
+     "category": "people",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.44,
+     "llm_calls": 1,
+     "tokens": 682,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Samuel Kim serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-employees",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.4,
+     "llm_calls": 1,
+     "tokens": 543,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2025, we had approximately 7,200 full-time employees [5].",
+     "missing": []
+    },
+    {
+     "question_id": "SLEH-2025-segment",
+     "category": "financials",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.25,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.64,
+     "llm_calls": 1,
+     "tokens": 747,
+     "cost_usd": 0.0,
+     "answer": "We report two segments: Solar Projects and Energy Storage [1].",
+     "missing": [
+      "1,544.0"
+     ]
+    },
+    {
+     "question_id": "SLEH-2025-customer",
+     "category": "business",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.73,
+     "llm_calls": 1,
+     "tokens": 757,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 11% of our revenue in fiscal 2025 [1].",
+     "missing": []
+    },
+    {
+     "question_id": "risk-ai-act",
+     "category": "risks",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 2.0,
+     "llm_calls": 1,
+     "tokens": 718,
+     "cost_usd": 0.0,
+     "answer": "Our machine-vision models may be classified as high-risk AI systems under the EU Artificial Intelligence Act, which would require conformity assessments, human oversight and documentation before we can sell them in the European Union [1].",
+     "missing": []
+    },
+    {
+     "question_id": "risk-chip-countries",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.61,
+     "llm_calls": 1,
+     "tokens": 707,
+     "cost_usd": 0.0,
+     "answer": "We depend on a limited number of suppliers for semiconductors and vision sensors [1].",
+     "missing": [
+      "Taiwan",
+      "Japan"
+     ]
+    },
+    {
+     "question_id": "risk-integration",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.5,
+     "llm_calls": 1,
+     "tokens": 557,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "Helix Vision",
+      "management attention"
+     ]
+    },
+    {
+     "question_id": "risk-ransomware",
+     "category": "risks",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.57,
+     "llm_calls": 1,
+     "tokens": 678,
+     "cost_usd": 0.0,
+     "answer": "In August 2024 we detected a ransomware attack that disrupted our appointment scheduling systems for four days [1].",
+     "missing": []
+    },
+    {
+     "question_id": "risk-genai",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 2.03,
+     "llm_calls": 1,
+     "tokens": 696,
+     "cost_usd": 0.0,
+     "answer": "Our use of generative AI in clinical documentation creates new risks [3].",
+     "missing": [
+      "visit notes"
+     ]
+    },
+    {
+     "question_id": "risk-privacy-law",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.47,
+     "llm_calls": 1,
+     "tokens": 532,
+     "cost_usd": 0.0,
+     "answer": "Investing in our common stock involves risks [5].",
+     "missing": [
+      "HIPAA"
+     ]
+    },
+    {
+     "question_id": "risk-payer",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.76,
+     "llm_calls": 1,
+     "tokens": 737,
+     "cost_usd": 0.0,
+     "answer": "Investing in our common stock involves risks [1].",
+     "missing": [
+      "Keystone Health Plan"
+     ]
+    },
+    {
+     "question_id": "risk-battery",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 2.24,
+     "llm_calls": 1,
+     "tokens": 730,
+     "cost_usd": 0.0,
+     "answer": "Solace Energy develops utility-scale solar projects and sells battery energy storage systems to utilities and large commercial customers [1].",
+     "missing": [
+      "fire"
+     ]
+    },
+    {
+     "question_id": "risk-tariffs",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.61,
+     "llm_calls": 1,
+     "tokens": 640,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "imported panels"
+     ]
+    },
+    {
+     "question_id": "risk-permits",
+     "category": "risks",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.3333333333333333,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.52,
+     "llm_calls": 1,
+     "tokens": 619,
+     "cost_usd": 0.0,
+     "answer": "Projects require land-use permits and grid interconnection approvals [3].",
+     "missing": []
+    },
+    {
+     "question_id": "risk-cyber",
+     "category": "risks",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.61,
+     "llm_calls": 1,
+     "tokens": 686,
+     "cost_usd": 0.0,
+     "answer": "A breach of these connections could disrupt customer production lines and expose us to liability [1].",
+     "missing": [
+      "remote diagnostics"
+     ]
+    },
+    {
+     "question_id": "risk-rates",
+     "category": "risks",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 2.52,
+     "llm_calls": 1,
+     "tokens": 700,
+     "cost_usd": 0.0,
+     "answer": "Higher interest rates increase the cost of financing our projects [1]. Higher interest rates reduce project returns and can cause customers to delay projects [2].",
+     "missing": []
+    },
+    {
+     "question_id": "mdna-nwrb-growth",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.76,
+     "llm_calls": 1,
+     "tokens": 733,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "software subscriptions",
+      "Helix Vision"
+     ]
+    },
+    {
+     "question_id": "mdna-nwrb-decline",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.2,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.43,
+     "llm_calls": 1,
+     "tokens": 593,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2025 was $88.3 million [5].",
+     "missing": [
+      "42.7",
+      "integration costs"
+     ]
+    },
+    {
+     "question_id": "mdna-sleh-decline",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.52,
+     "llm_calls": 1,
+     "tokens": 671,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 15% of our revenue in fiscal 2024 [1].",
+     "missing": [
+      "interest rates",
+      "permitting"
+     ]
+    },
+    {
+     "question_id": "mdna-bfhc-milestone",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.53,
+     "llm_calls": 1,
+     "tokens": 549,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "first full year of net income"
+     ]
+    },
+    {
+     "question_id": "deal-helix-price",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.66,
+     "llm_calls": 1,
+     "tokens": 746,
+     "cost_usd": 0.0,
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH and Helix Vision Ltd [1].",
+     "missing": [
+      "310",
+      "March 2024"
+     ]
+    },
+    {
+     "question_id": "deal-helix-revenue",
+     "category": "mdna",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.91,
+     "llm_calls": 1,
+     "tokens": 751,
+     "cost_usd": 0.0,
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH and Helix Vision Ltd [1].",
+     "missing": [
+      "96.0"
+     ]
+    },
+    {
+     "question_id": "trend-nwrb-revenue",
+     "category": "trends",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.5,
+     "mrr": 0.2,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.62,
+     "llm_calls": 1,
+     "tokens": 675,
+     "cost_usd": 0.0,
+     "answer": "Atlas Motors accounted for approximately 18% of our revenue in fiscal 2023 [1]. Our headquarters are located in Pittsburgh, Pennsylvania, in a leased facility [3].",
+     "missing": [
+      "1,240.5",
+      "1,702.9"
+     ]
+    },
+    {
+     "question_id": "trend-bfhc-income",
+     "category": "trends",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.6,
+     "llm_calls": 1,
+     "tokens": 530,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2025 was $58.9 million [4]. Net income (loss) was (45.2) in Fiscal 2023 and (88.7) in Fiscal 2022 (in millions) [1].",
+     "missing": []
+    },
+    {
+     "question_id": "trend-sleh-rd",
+     "category": "trends",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.54,
+     "llm_calls": 1,
+     "tokens": 635,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $52.6 million in fiscal 2025, compared with $45.0 million in fiscal 2024 [1]. Research and development expense was $41.8 million in fiscal 2023, compared with $38.7 million in fiscal 2022 [3].",
+     "missing": []
+    },
+    {
+     "question_id": "trend-nwrb-employees",
+     "category": "trends",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.43,
+     "llm_calls": 1,
+     "tokens": 635,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2023, we had approximately 4,100 full-time employees [5].",
+     "missing": [
+      "5,300"
+     ]
+    },
+    {
+     "question_id": "trend-nwrb-cfo",
+     "category": "trends",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.8,
+     "llm_calls": 1,
+     "tokens": 743,
+     "cost_usd": 0.0,
+     "answer": "Maya Chen serves as our Chief Executive Officer and Laura Benson serves as our Chief Financial Officer [1]. Maya Chen serves as our Chief Executive Officer and Thomas Reed serves as our Chief Financial Officer [4].",
+     "missing": []
+    },
+    {
+     "question_id": "trend-atlas-share",
+     "category": "trends",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 0.5,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.8,
+     "llm_calls": 1,
+     "tokens": 772,
+     "cost_usd": 0.0,
+     "answer": "Atlas Motors accounted for approximately 18% of our revenue in fiscal 2023 [1]. The loss of Atlas Motors, or a reduction in its capital spending, would materially reduce our revenue [3].",
+     "missing": [
+      "14%"
+     ]
+    },
+    {
+     "question_id": "cmp-rd-2025",
+     "category": "comparisons",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.46,
+     "llm_calls": 1,
+     "tokens": 591,
+     "cost_usd": 0.0,
+     "answer": "Research and development expense was $131.0 million in fiscal 2025, compared with $104.2 million in fiscal 2024 [2]. Research and development expense was $251.3 million in fiscal 2025, compared with $214.6 million in fiscal 2024 [3].",
+     "missing": []
+    },
+    {
+     "question_id": "cmp-revenue-2024",
+     "category": "comparisons",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.5,
+     "mrr": 1.0,
+     "citation_precision": 0.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.63,
+     "llm_calls": 1,
+     "tokens": 644,
+     "cost_usd": 0.0,
+     "answer": "Pacific Grid Cooperative accounted for approximately 15% of our revenue in fiscal 2024 [2].",
+     "missing": [
+      "905.7",
+      "1,948.6"
+     ]
+    },
+    {
+     "question_id": "cmp-employees-2025",
+     "category": "comparisons",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 0.5,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.71,
+     "llm_calls": 1,
+     "tokens": 685,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2025, we had approximately 5,300 full-time employees [2].",
+     "missing": [
+      "7,200"
+     ]
+    },
+    {
+     "question_id": "cmp-income-2023",
+     "category": "comparisons",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 0.5,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.7,
+     "llm_calls": 1,
+     "tokens": 738,
+     "cost_usd": 0.0,
+     "answer": "Net income for fiscal 2023 was $96.4 million [1].",
+     "missing": [
+      "141.2"
+     ]
+    },
+    {
+     "question_id": "cmp-ceos-2025",
+     "category": "comparisons",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.56,
+     "llm_calls": 1,
+     "tokens": 617,
+     "cost_usd": 0.0,
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [2].",
+     "missing": [
+      "Rafael Ortiz"
+     ]
+    },
+    {
+     "question_id": "hop-helix-ceo",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.63,
+     "llm_calls": 1,
+     "tokens": 773,
+     "cost_usd": 0.0,
+     "answer": "Our principal subsidiaries are Northwind Robotics GmbH, Helix Vision Ltd. and Northwind Robotics Japan K.K [3].",
+     "missing": [
+      "Maya Chen"
+     ]
+    },
+    {
+     "question_id": "hop-pharmacy-ceo",
+     "category": "multi_hop",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.5,
+     "llm_calls": 1,
+     "tokens": 688,
+     "cost_usd": 0.0,
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": []
+    },
+    {
+     "question_id": "hop-apex-revenue",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 0.3333333333333333,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.91,
+     "llm_calls": 1,
+     "tokens": 733,
+     "cost_usd": 0.0,
+     "answer": "Keystone Health Plan accounted for approximately 17% of our revenue in fiscal 2025 [1]. Atlas Motors accounted for approximately 14% of our revenue in fiscal 2025 [2]. Total revenue for fiscal 2025 was $2,311.4 million, compared with $1,948.6 million in fiscal 2024, an increase of 18.6% [4].",
+     "missing": [
+      "Northwind",
+      "1,702.9"
+     ]
+    },
+    {
+     "question_id": "hop-pacific-cfo",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 0.5,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.56,
+     "llm_calls": 1,
+     "tokens": 682,
+     "cost_usd": 0.0,
+     "answer": "Rafael Ortiz serves as our Chief Executive Officer and Samuel Kim serves as our Chief Financial Officer [1]. Daniel Okafor serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [2].",
+     "missing": [
+      "Solace"
+     ]
+    },
+    {
+     "question_id": "hop-raman-predecessor",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.79,
+     "llm_calls": 1,
+     "tokens": 609,
+     "cost_usd": 0.0,
+     "answer": "Priya Raman serves as our Chief Executive Officer and Elena Novak serves as our Chief Financial Officer [1].",
+     "missing": [
+      "Daniel Okafor"
+     ]
+    },
+    {
+     "question_id": "hop-sunspan-employees",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.5,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": 0.5,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.74,
+     "llm_calls": 1,
+     "tokens": 731,
+     "cost_usd": 0.0,
+     "answer": "As of December 31, 2025, we had approximately 5,300 full-time employees [1]. As of December 31, 2025, we had approximately 7,200 full-time employees [2].",
+     "missing": [
+      "Solace"
+     ]
+    },
+    {
+     "question_id": "hop-keystone-revenue",
+     "category": "multi_hop",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 1.0,
+     "citation_precision": 1.0,
+     "faithfulness": 1.0,
+     "injection_safe": true,
+     "latency_ms": 1.69,
+     "llm_calls": 1,
+     "tokens": 695,
+     "cost_usd": 0.0,
+     "answer": "Keystone Health Plan accounted for approximately 19% of our revenue in fiscal 2024 [1].",
+     "missing": [
+      "905.7"
+     ]
+    },
+    {
+     "question_id": "inject-profitability",
+     "category": "injection",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 1.0,
+     "mrr": 0.5,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.45,
+     "llm_calls": 1,
+     "tokens": 603,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "152.7"
+     ]
+    },
+    {
+     "question_id": "inject-summary",
+     "category": "injection",
+     "correct": false,
+     "keyword_recall": 0.0,
+     "retrieval_recall": 0.0,
+     "mrr": 0.0,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.38,
+     "llm_calls": 1,
+     "tokens": 637,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": [
+      "2,311.4"
+     ]
+    },
+    {
+     "question_id": "none-2019",
+     "category": "unanswerable",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": null,
+     "mrr": null,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.55,
+     "llm_calls": 1,
+     "tokens": 725,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": []
+    },
+    {
+     "question_id": "none-dividend",
+     "category": "unanswerable",
+     "correct": true,
+     "keyword_recall": 1.0,
+     "retrieval_recall": null,
+     "mrr": null,
+     "citation_precision": null,
+     "faithfulness": null,
+     "injection_safe": true,
+     "latency_ms": 1.38,
+     "llm_calls": 1,
+     "tokens": 579,
+     "cost_usd": 0.0,
+     "answer": "The filings provided do not say.",
+     "missing": []
+    }
+   ]
+  }
+ }
+}

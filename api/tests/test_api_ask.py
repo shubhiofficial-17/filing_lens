@@ -39,3 +39,10 @@ def test_ask_validates_input(client):
     assert client.post("/api/ask", json={"question": "x" * 501}).status_code == 422
     r = client.post("/api/ask", json={"question": "What is revenue?", "strategy": "magic"})
     assert r.status_code == 422
+
+
+def test_eval_report_is_served_without_per_question_scores(client):
+    report = client.get("/api/eval/report").json()
+    assert "naive" in report["strategies"]
+    assert "scores" not in report["strategies"]["naive"]
+    assert "overall" in report["strategies"]["naive"]

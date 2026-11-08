@@ -170,8 +170,8 @@ COMPANIES: tuple[Company, ...] = (
             Risk(
                 "reimbursement",
                 "Changes in reimbursement for virtual care could reduce our revenue.",
-                "Payers, including Keystone Health Plan, may reduce reimbursement rates for virtual "
-                "visits, and Medicare telehealth flexibilities may not be extended.",
+                "Payers, including Keystone Health Plan, may reduce reimbursement rates for "
+                "virtual visits, and Medicare telehealth flexibilities may not be extended.",
             ),
             Risk(
                 "ransomware",
@@ -333,7 +333,8 @@ def render_html(c: Company, y: int) -> str:
     toc_rows = [
         ("Item 1.", "Business"), ("Item 1A.", "Risk Factors"), ("Item 2.", "Properties"),
         ("Item 3.", "Legal Proceedings"),
-        ("Item 7.", "Management's Discussion and Analysis of Financial Condition and Results of Operations"),
+        ("Item 7.", "Management's Discussion and Analysis of Financial Condition and Results "
+                    "of Operations"),
         ("Item 8.", "Financial Statements and Supplementary Data"),
     ]
     out: list[str] = [
@@ -415,7 +416,8 @@ def render_html(c: Company, y: int) -> str:
         f"<tr><td>Net income (loss)</td><td>$</td><td>{table_money(c.net_income[y])}</td>"
         f"<td>$</td><td>{table_money(c.net_income[y - 1])}</td></tr>"
         "</table>",
-        p("The accompanying notes are an integral part of these consolidated financial statements."),
+        p("The accompanying notes are an integral part of these consolidated financial "
+          "statements."),
         "</body></html>",
     ]
     return "\n".join(out)

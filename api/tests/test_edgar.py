@@ -25,7 +25,8 @@ def _client(seen: list[httpx.Request]) -> EdgarClient:
         seen.append(request)
         url = str(request.url)
         if url.endswith("company_tickers.json"):
-            return httpx.Response(200, json={"0": {"cik_str": 1234, "ticker": "ABC", "title": "Abc Inc"}})
+            row = {"cik_str": 1234, "ticker": "ABC", "title": "Abc Inc"}
+            return httpx.Response(200, json={"0": row})
         if "submissions/CIK0000001234.json" in url:
             return httpx.Response(200, json=SUBMISSIONS)
         if "/Archives/edgar/data/1234/" in url:

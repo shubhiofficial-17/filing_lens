@@ -48,7 +48,10 @@ def test_single_column_layout_tables_are_read_as_paragraphs():
 
 
 def test_item_headings_accept_dashes_and_lower_case():
-    html = "<p>ITEM 7A — Quantitative Disclosures</p><p>Rates.</p><p>item 8: Financials</p><p>T.</p>"
+    html = (
+        "<p>ITEM 7A \u2014 Quantitative Disclosures</p><p>Rates.</p>"
+        "<p>item 8: Financials</p><p>T.</p>"
+    )
     sections = parse_filing_html(html, "F")
     assert [(s.item, s.title) for s in sections] == [
         ("7A", "Quantitative Disclosures"),

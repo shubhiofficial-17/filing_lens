@@ -37,6 +37,10 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: pytest -v
+      - name: Evaluation (demo model, fixture corpus)
+        run: |
+          python -m app.eval.run --check --out /tmp/eval-report.json --markdown /tmp/eval.md
+          cat /tmp/eval.md >> "$GITHUB_STEP_SUMMARY"
 
   web:
     runs-on: ubuntu-latest
