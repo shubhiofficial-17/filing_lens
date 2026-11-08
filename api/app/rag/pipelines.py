@@ -28,6 +28,8 @@ class RagContext:
     llm: LlmClient
     top_k: int = 5
     strong_model: str | None = None
+    mcp_transport: str = "direct"  # "direct" | "stdio" | "http"
+    mcp_url: str | None = None
     _catalog: Catalog | None = field(default=None, repr=False)
     _catalog_size: int = -1
     _graph: Graph | None = field(default=None, repr=False)

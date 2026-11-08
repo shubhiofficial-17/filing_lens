@@ -33,6 +33,11 @@ class Settings(BaseSettings):
 
     top_k: int = 5
 
+    # How the MCP agent reaches its tools: "stdio" (starts the MCP server as a subprocess),
+    # "http" (FILINGLENS_MCP_URL, e.g. http://mcp:8001/mcp) or "direct" (in-process calls).
+    mcp_transport: str = "stdio"
+    mcp_url: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

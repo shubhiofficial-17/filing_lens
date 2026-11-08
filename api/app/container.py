@@ -29,6 +29,9 @@ class Container:
     persistent: bool
 
     def close(self) -> None:
+        from app.mcp.agent import close_toolboxes
+
+        close_toolboxes()
         close = getattr(self.store, "close", None)
         if close:
             close()
@@ -58,7 +61,8 @@ def build_rag(settings: Settings, store: Store, llm: LlmClient) -> RagContext:
     if settings.seed_fixtures and store.count_filings() == 0:
         Ingestor(store, embedder).ingest_fixtures()
     return RagContext(store=store, embedder=embedder, llm=llm, top_k=settings.top_k,
-                      strong_model=settings.llm_strong_model or None)
+                      strong_model=settings.llm_strong_model or None,
+                      mcp_transport=settings.mcp_transport, mcp_url=settings.mcp_url)
 
 
 def build_container(settings: Settings) -> Container:

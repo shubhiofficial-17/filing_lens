@@ -3,8 +3,9 @@
     python -m app.mcp.server                          # stdio (Claude Desktop, VS Code, Cursor)
     python -m app.mcp.server --transport http --port 8001   # streamable HTTP at /mcp
 
-It uses the same settings as the API (FILINGLENS_*), so it can point at the same Postgres
-database or, with nothing configured, load the fixture corpus in memory.
+Built on the official MCP Python SDK (v2, `MCPServer`). It uses the same settings as the
+API (FILINGLENS_*), so it can point at the same Postgres database or, with nothing
+configured, load the fixture corpus in memory.
 """
 
 from __future__ import annotations
@@ -15,8 +16,9 @@ import logging
 import sys
 from functools import lru_cache
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
+from app import __version__
 from app.mcp.tools import Tools
 
 INSTRUCTIONS = (
@@ -37,8 +39,8 @@ def tools() -> Tools:
     return Tools(build_container(get_settings()).rag)
 
 
-def build_server(host: str = "127.0.0.1", port: int = 8001) -> FastMCP:
-    mcp = FastMCP("FilingLens", instructions=INSTRUCTIONS, host=host, port=port)
+def build_server() -> MCPServer:
+    mcp = MCPServer("FilingLens", instructions=INSTRUCTIONS, version=__version__)
 
     @mcp.tool()
     def list_companies() -> dict:
@@ -119,8 +121,11 @@ def main(argv: list[str] | None = None) -> int:
     # stdout is the protocol channel in stdio mode: logs must go to stderr.
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
     tools()  # load the corpus before the first request
-    server = build_server(args.host, args.port)
-    server.run(transport="streamable-http" if args.transport == "http" else "stdio")
+    server = build_server()
+    if args.transport == "http":
+        server.run(transport="streamable-http", host=args.host, port=args.port)
+    else:
+        server.run(transport="stdio")
     return 0
 
 

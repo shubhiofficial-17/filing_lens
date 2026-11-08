@@ -147,6 +147,28 @@ class DemoLlm:
             verdicts.append({"sentence": int(m.group(1)), "supported": ok})
         return json.dumps({"verdicts": verdicts})
 
+    def _task_tool_agent(self, user: str) -> str:
+        question = tag(user, "question")
+        observed = re.findall(r"^\d+\. (\w+)\((.*?)\) -> (.*)$", tag(user, "observations"), re.M)
+        called = [name for name, _, _ in observed]
+        relational = re.search(
+            r"\b(owns?|subsidiar\w*|customer|competitors?|succeed\w*|which company|"
+            r"the company (?:that|whose))\b", question, re.I)
+        if not called:
+            if relational:
+                return json.dumps({"action": "call", "tool": "graph_lookup",
+                                   "arguments": {"text": question}})
+            return json.dumps({"action": "call", "tool": "search_filings",
+                               "arguments": {"query": question}})
+        if called == ["graph_lookup"]:
+            try:
+                companies = json.loads(observed[0][2]).get("companies", [])
+            except ValueError:
+                companies = []
+            return json.dumps({"action": "call", "tool": "search_filings",
+                               "arguments": {"query": question, "tickers": companies}})
+        return json.dumps({"action": "answer"})
+
     def _task_assess(self, user: str) -> str:
         query = tag(user, "question")
         picked = pick_sentences(query, parse_excerpts(tag(user, "excerpts")))

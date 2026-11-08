@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
 import time
@@ -33,7 +34,13 @@ def eval_context() -> RagContext:
     from app.container import build_llm, build_rag
     from app.store.memory import InMemoryStore
 
-    settings = get_settings().model_copy(update={"database_url": None, "seed_fixtures": True})
+    # The MCP agent calls its tools in-process here ("direct"): same functions, no
+    # subprocess, so the run stays fast and deterministic. tests/test_mcp_client.py covers
+    # the real stdio transport. Set FILINGLENS_EVAL_MCP_TRANSPORT=stdio to evaluate it.
+    transport = os.environ.get("FILINGLENS_EVAL_MCP_TRANSPORT", "direct")
+    settings = get_settings().model_copy(
+        update={"database_url": None, "seed_fixtures": True, "mcp_transport": transport}
+    )
     return build_rag(settings, InMemoryStore(), build_llm(settings))
 
 
@@ -94,6 +101,7 @@ def run(strategies: list[str], limit: int | None = None) -> dict:
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "model": ctx.llm.name,
         "embedder": ctx.embedder.name,
+        "mcp_transport": ctx.mcp_transport,
         "demo_mode": ctx.llm.name.startswith("demo"),
         "questions": len(qs),
         "strategies": {},
