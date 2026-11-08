@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Observable, of } from 'rxjs';
 
 import { AppComponent } from './app.component';
@@ -9,16 +10,18 @@ describe('AppComponent', () => {
     const fake: Pick<HealthService, 'check'> = { check: (): Observable<ApiStatus> => of(status) };
     TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [{ provide: HealthService, useValue: fake }],
+      providers: [provideRouter([]), { provide: HealthService, useValue: fake }],
     });
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('shows the app name', () => {
+  it('shows the app name and navigation', () => {
     const el = render({ state: 'ready' });
     expect(el.querySelector('h1')?.textContent).toContain('FilingLens');
+    const links = Array.from(el.querySelectorAll('nav a')).map((a) => a.textContent?.trim());
+    expect(links).toEqual(['Ask', 'Evaluation', 'Filings']);
   });
 
   it('shows the API as ready with the pgvector version', () => {

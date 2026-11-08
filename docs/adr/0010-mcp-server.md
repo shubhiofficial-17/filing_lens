@@ -13,8 +13,8 @@ MCP client.
 ## Decision
 
 - **Tools are plain functions** (`app/mcp/tools.py`) over the same `RagContext` the API
-  uses. The MCP server (`app/mcp/server.py`, built with the official SDK's FastMCP) is a
-  thin wrapper around them. The tools are tested without MCP, and the server is tested
+  uses. The MCP server (`app/mcp/server.py`, built with the official Python SDK v2's
+  `MCPServer`) is a thin wrapper around them. The tools are tested without MCP, and the server is tested
   through the SDK.
 - **Tools**: `list_companies`, `search_filings`, `get_section`, `get_financials`,
   `compare_companies`, `graph_lookup` and `ask` (a full cited answer with a chosen
