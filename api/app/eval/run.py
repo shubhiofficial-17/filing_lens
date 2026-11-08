@@ -156,7 +156,7 @@ def markdown(report: dict) -> str:
         "| Strategy | " + " | ".join(label for _, label in METRICS) + " |",
         "|---|" + "---:|" * len(METRICS),
     ]
-    for name, data in report["strategies"].items():
+    for data in report["strategies"].values():
         o = data["overall"]
         lines.append(f"| {data['title']} | " + " | ".join(fmt(k, o[k]) for k, _ in METRICS) + " |")
 

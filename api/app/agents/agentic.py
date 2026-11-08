@@ -98,7 +98,6 @@ class AgenticRag(GraphRag):
         self, question: str, filt: SearchFilter | None, trace: Trace
     ) -> tuple[str, list[Hit], list]:
         """Plan, research every step, answer and verify. Returns (text, evidence, facts)."""
-        catalog = self.ctx.catalog
         steps = self.plan(question, filt, trace)
 
         groups: list[list[Hit]] = []

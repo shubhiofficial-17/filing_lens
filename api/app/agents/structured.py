@@ -12,12 +12,9 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Callable
-from typing import TypeVar
 
 from app.llm.base import LlmClient, Message
 from app.rag.trace import Trace
-
-T = TypeVar("T")
 
 
 class InvalidOutput(ValueError):
@@ -37,7 +34,7 @@ def extract_json(text: str) -> dict:
     return data
 
 
-def complete_json(
+def complete_json[T](
     llm: LlmClient,
     messages: list[Message],
     validate: Callable[[dict], T],

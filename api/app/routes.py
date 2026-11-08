@@ -92,7 +92,9 @@ def strategies() -> list[dict]:
 @router.post("/ask")
 def ask(body: AskRequest, request: Request) -> dict:
     from app.llm.base import LlmError
+    from app.mcp.client import ToolboxError
     from app.models import SearchFilter
+    from app.rag.embeddings import EmbeddingError
     from app.rag.strategies import PIPELINES
 
     pipeline_cls = PIPELINES.get(body.strategy)
@@ -107,8 +109,10 @@ def ask(body: AskRequest, request: Request) -> dict:
         )
     try:
         answer = pipeline_cls(_container(request).rag).run(body.question.strip(), filt)
-    except LlmError as e:
+    except (LlmError, EmbeddingError) as e:
         raise HTTPException(502, f"the model is unavailable: {e}") from e
+    except ToolboxError as e:
+        raise HTTPException(503, f"the MCP tools are unavailable: {e}") from e
     return answer_json(answer)
 
 

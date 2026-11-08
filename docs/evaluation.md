@@ -1,15 +1,15 @@
 # Evaluation results
 
-112 labelled questions over the fixture corpus · model: demo model (deterministic, not an AI) · embedder: hashing-256 · generated 2026-11-08T18:24:22Z
+112 labelled questions over the fixture corpus · model: demo model (deterministic, not an AI) · embedder: hashing-256 · generated 2026-11-08T18:26:29Z
 
 | Strategy | Accuracy | Retrieval recall | MRR | Citation precision | Faithfulness | Injection-safe | LLM calls | Tokens | p50 ms |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Naive RAG | 58.0% | 81.8% | 62.0% | 75.3% | 100.0% | 50.0% | 1.0 | 644 | 3 |
-| Hybrid + rerank | 89.3% | 99.1% | 91.4% | 88.3% | 100.0% | 50.0% | 1.0 | 715 | 2 |
+| Naive RAG | 58.0% | 81.8% | 62.0% | 75.3% | 100.0% | 50.0% | 1.0 | 644 | 2 |
+| Hybrid + rerank | 89.3% | 99.1% | 91.4% | 88.3% | 100.0% | 50.0% | 1.0 | 715 | 1 |
 | GraphRAG | 92.9% | 100.0% | 91.0% | 91.1% | 100.0% | 50.0% | 1.0 | 805 | 2 |
 | Agentic RAG | 93.8% | 100.0% | 91.0% | 90.6% | 100.0% | 100.0% | 3.1 | 1,841 | 3 |
 | Router + reflection | 93.8% | 100.0% | 91.0% | 90.6% | 100.0% | 100.0% | 2.0 | 1,506 | 2 |
-| Multi-agent | 92.0% | 100.0% | 95.5% | 87.9% | 100.0% | 100.0% | 5.2 | 3,525 | 4 |
+| Multi-agent | 92.0% | 100.0% | 95.5% | 87.9% | 100.0% | 100.0% | 5.2 | 3,525 | 3 |
 | MCP tool agent | 92.9% | 100.0% | 92.7% | 94.0% | 100.0% | 100.0% | 3.2 | 2,388 | 2 |
 
 ## Accuracy by question type
