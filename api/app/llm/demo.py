@@ -124,6 +124,29 @@ class DemoLlm:
                    if not any(c[0] == t and (y is None or c[1] == y) for c in cited)]
         return json.dumps({"missing": missing, "issues": []})
 
+    def _task_research(self, user: str) -> str:
+        picked = pick_sentences(tag(user, "question"), parse_excerpts(tag(user, "excerpts")))
+        return json.dumps({"findings": [{"claim": s, "excerpt": n} for n, s, _ in picked]})
+
+    def _task_factcheck(self, user: str) -> str:
+        from app.rag.verify import is_supported
+
+        found = {e.n: e for e in parse_excerpts(tag(user, "excerpts"))}
+        verdicts = []
+        for line in tag(user, "draft").splitlines():
+            m = re.match(r"(\d+)\. (.*)", line)
+            if not m:
+                continue
+            cited = [int(n) for n in re.findall(r"\[(\d+)\]", m.group(2)) if int(n) in found]
+            evidence = " ".join(
+                f"{found[n].company} ({found[n].ticker}), fiscal {found[n].year}\n{found[n].text}"
+                for n in cited
+            )
+            ok = m.group(2).startswith("Calculated:") or (
+                bool(cited) and is_supported(m.group(2), evidence))
+            verdicts.append({"sentence": int(m.group(1)), "supported": ok})
+        return json.dumps({"verdicts": verdicts})
+
     def _task_assess(self, user: str) -> str:
         query = tag(user, "question")
         picked = pick_sentences(query, parse_excerpts(tag(user, "excerpts")))

@@ -20,5 +20,10 @@
     "accuracy": 0.87,
     "retrieval_recall": 0.95,
     "injection_safe": 1.0
+  },
+  "multi_agent": {
+    "accuracy": 0.85,
+    "retrieval_recall": 0.95,
+    "injection_safe": 1.0
   }
 }
