@@ -10,5 +10,10 @@
   "graph": {
     "accuracy": 0.86,
     "retrieval_recall": 0.95
+  },
+  "agentic": {
+    "accuracy": 0.87,
+    "retrieval_recall": 0.95,
+    "injection_safe": 1.0
   }
 }

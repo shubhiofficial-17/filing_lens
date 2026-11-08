@@ -167,6 +167,13 @@ def facts_as_notes(facts: list, hits: list[Hit]) -> str:
     return "Knowledge-graph facts:\n" + "\n".join(lines) if lines else ""
 
 
+@dataclass
+class Gathered:
+    hits: list[Hit]
+    facts: list
+    bridges: list[str]
+
+
 class GraphRag(HybridRag):
     name = "graph"
     title = "GraphRAG"
@@ -177,7 +184,7 @@ class GraphRag(HybridRag):
     )
     provenance_slots = 3
 
-    def gather(self, question: str, filt: SearchFilter | None, trace: Trace):
+    def gather(self, question: str, filt: SearchFilter | None, trace: Trace) -> Gathered:
         with trace.step("graph lookup") as d:
             result = self.ctx.graph.expand(question)
             d.update(entities=[e.name for e in result.mentioned],
@@ -196,11 +203,12 @@ class GraphRag(HybridRag):
             merged += [h for h in hits if h.chunk.id not in {c.id for c in provenance}]
             merged = merged[: self.ctx.top_k + self.provenance_slots]
             d["hits"] = summarise_hits(merged)
-        return merged, facts_as_notes(result.facts, merged)
+        return Gathered(merged, result.facts, result.bridge_tickers)
 
     def run(self, question: str, filt: SearchFilter | None = None) -> Answer:
         trace = Trace()
-        hits, notes = self.gather(question, filt, trace)
+        found = self.gather(question, filt, trace)
+        hits, notes = found.hits, facts_as_notes(found.facts, found.hits)
         with trace.step("generate answer"):
             completion = trace.record(
                 generate_answer(self.ctx.llm, question, hits, self.ctx.catalog, notes=notes)

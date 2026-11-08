@@ -4,8 +4,10 @@ It exists so that the whole system (API, agents, MCP server, evaluation, end-to-
 runs offline and in CI with no API key, and gives the same output every time. It reads the
 `TASK:` line of the system prompt and does a simple, rule-based version of that job:
 
-- answer: picks the excerpt sentences that best overlap the question and cites them
-- other tasks are added by later milestones
+- answer: picks the excerpt sentences that best overlap the question and cites them; uses
+  knowledge-graph facts from the notes when they match
+- plan: one search per company or year mentioned, or two chained searches for "X, and Y"
+- assess: "sufficient" when some excerpt sentence matches the query well
 
 Its answers are extractive and naive on purpose. In particular it will happily repeat
 instructions planted in a document, which is exactly what the guardrails must catch.
@@ -14,6 +16,7 @@ Numbers reported "in demo mode" measure retrieval and orchestration, not languag
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 
@@ -95,6 +98,16 @@ class DemoLlm:
         return Completion(text=text, model=self.name, usage=usage)
 
     # --- tasks ---------------------------------------------------------------------------
+    def _task_plan(self, user: str) -> str:
+        return json.dumps({"steps": plan(tag(user, "question"), tag(user, "corpus"))})
+
+    def _task_assess(self, user: str) -> str:
+        query = tag(user, "question")
+        picked = pick_sentences(query, parse_excerpts(tag(user, "excerpts")))
+        sufficient = bool(picked) and picked[0][2] >= 3
+        return json.dumps({"sufficient": sufficient,
+                           "query": "" if sufficient else expand_abbreviations(query)})
+
     def _task_answer(self, user: str) -> str:
         question = tag(user, "question")
         found = parse_excerpts(tag(user, "excerpts"))
@@ -130,6 +143,32 @@ def pick_facts(
             scored.append((overlap, int(m.group("n")), fact))
     scored.sort(key=lambda t: (-t[0], t[1]))
     return [(n, fact) for _, n, fact in scored[:limit]]
+
+
+_CORPUS_RE = re.compile(r"^- (?P<name>.+) \((?P<ticker>[A-Z.]+)\)$", re.M)
+_CHAIN_RE = re.compile(r"^(?P<a>.+?),? and (?P<b>(?:who|what|how|when|which)\b.+)$", re.I)
+
+
+def plan(question: str, corpus: str) -> list[dict]:
+    companies = {m.group("ticker"): m.group("name") for m in _CORPUS_RE.finditer(corpus)}
+    known_years = {int(y) for y in re.findall(r"\b20\d{2}\b", corpus.split("Fiscal years:")[-1])}
+    words = {re.sub(r"'s$", "", w.strip("?,.").lower()) for w in question.split()}
+    tickers = [t for t, name in companies.items()
+               if company_key(name) in words or t.lower() in words]
+    years = [y for y in dict.fromkeys(years_in(question)) if y in known_years]
+
+    chain = _CHAIN_RE.match(question)
+    if chain and not tickers:
+        first, second = chain.group("a").rstrip(" ,"), chain.group("b")
+        return [
+            {"query": first, "tickers": [], "years": [], "uses_previous": False},
+            {"query": second, "tickers": [], "years": years, "uses_previous": True},
+        ]
+    if len(tickers) > 1:
+        return [{"query": question, "tickers": [t], "years": years} for t in tickers]
+    if len(years) > 1:
+        return [{"query": question, "tickers": tickers, "years": [y]} for y in years]
+    return [{"query": question, "tickers": tickers, "years": years}]
 
 
 def score_sentence(

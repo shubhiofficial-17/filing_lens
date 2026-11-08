@@ -6,6 +6,10 @@ import re
 
 _TOKEN_RE = re.compile(r"\d+(?:,\d{3})*(?:\.\d+)?%?|[a-z]+(?:'[a-z]+)?")
 _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"(])")
+# A period after these does not end a sentence: "Northwind Robotics, Inc. (NWRB) reported..."
+_ABBREVIATIONS = re.compile(
+    r"\b(?:Inc|Ltd|Corp|Co|Mr|Mrs|Ms|Dr|No|Nos|vs|approx|U\.S|K\.K|S\.A)\.$"
+)
 
 STOPWORDS = frozenset(
     """a an and are as at be been being but by did do does for from had has have how in into is it
@@ -50,7 +54,13 @@ def sentences(text: str) -> list[str]:
         if block.startswith("|"):
             out.append(block)
             continue
-        out.extend(s.strip() for s in _SENTENCE_RE.split(block) if s.strip())
+        for part in (s.strip() for s in _SENTENCE_RE.split(block)):
+            if not part:
+                continue
+            if out and _ABBREVIATIONS.search(out[-1]) and not out[-1].startswith("|"):
+                out[-1] = f"{out[-1]} {part}"
+            else:
+                out.append(part)
     return out
 
 
