@@ -118,7 +118,7 @@ def run(strategies: list[str], limit: int | None = None) -> dict:
                 {"id": s.question_id, "missing": s.missing, "answer": s.answer[:300]}
                 for s in scores if not s.correct
             ],
-            "scores": [asdict(s) for s in scores],
+            "scores": [{**asdict(s), "answer": s.answer[:200]} for s in scores],
         }
     return report
 

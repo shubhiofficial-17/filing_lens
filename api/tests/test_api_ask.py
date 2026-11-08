@@ -54,3 +54,15 @@ def test_graph_endpoint(client):
     body = client.get("/api/graph", params={"q": "Who owns SunSpan Brasil?"}).json()
     assert body["bridges"] == ["SLEH"]
     assert body["facts"][0]["relation"] == "OWNS"
+
+
+def test_ask_is_rate_limited_per_client():
+    settings = Settings(database_url=None, rate_limit_ask=2)
+    with TestClient(create_app(settings)) as c:
+        question = "What was Bluefin Health's revenue in fiscal 2024?"
+        body = {"question": question, "strategy": "naive"}
+        assert [c.post("/api/ask", json=body).status_code for _ in range(2)] == [200, 200]
+        limited = c.post("/api/ask", json=body)
+        assert limited.status_code == 429
+        assert int(limited.headers["Retry-After"]) > 0
+        assert c.get("/api/health").headers["X-Content-Type-Options"] == "nosniff"

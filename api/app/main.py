@@ -1,8 +1,9 @@
 import logging
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
@@ -54,6 +55,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if version is None:
             return _unavailable("pgvector missing")
         return JSONResponse({"status": "ready", "database": "ok", "pgvector": version})
+
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        started = time.perf_counter()
+        response = await call_next(request)
+        ms = (time.perf_counter() - started) * 1000
+        if request.url.path not in ("/api/health", "/api/health/ready"):
+            log.info("%s %s %d %.0fms", request.method, request.url.path, response.status_code, ms)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
 
     app.include_router(router)
     return app

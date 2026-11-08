@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from app.container import Container
 from app.ingest.edgar import EdgarClient, EdgarError
 from app.ingest.service import IngestError
+from app.ratelimit import enforce
 
 router = APIRouter(prefix="/api")
 
@@ -54,6 +55,7 @@ class IngestRequest(BaseModel):
 @router.post("/filings/ingest")
 def ingest(body: IngestRequest, request: Request) -> dict:
     container = _container(request)
+    enforce(container.ingest_limiter, request)
     try:
         if body.source == "fixtures":
             results = container.ingestor.ingest_fixtures()
@@ -96,6 +98,7 @@ def ask(body: AskRequest, request: Request) -> dict:
     pipeline_cls = PIPELINES.get(body.strategy)
     if pipeline_cls is None:
         raise HTTPException(422, f"unknown strategy: {body.strategy}")
+    enforce(_container(request).ask_limiter, request)
     filt = None
     if body.tickers or body.years:
         filt = SearchFilter(

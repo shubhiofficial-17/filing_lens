@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     mcp_transport: str = "stdio"
     mcp_url: str | None = None
 
+    # Requests per minute per client IP; 0 turns a limit off.
+    rate_limit_ask: int = 30
+    rate_limit_ingest: int = 5
+
 
 @lru_cache
 def get_settings() -> Settings:

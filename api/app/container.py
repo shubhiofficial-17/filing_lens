@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -11,6 +12,7 @@ from app.llm.base import LlmClient
 from app.llm.demo import DemoLlm
 from app.rag.embeddings import Embedder, HashingEmbedder, OpenAICompatibleEmbedder
 from app.rag.pipelines import RagContext
+from app.ratelimit import RateLimiter
 from app.store.base import Store
 from app.store.memory import InMemoryStore
 
@@ -27,6 +29,8 @@ class Container:
     ingestor: Ingestor
     rag: RagContext
     persistent: bool
+    ask_limiter: RateLimiter
+    ingest_limiter: RateLimiter
 
     def close(self) -> None:
         from app.mcp.agent import close_toolboxes
@@ -58,8 +62,10 @@ def build_embedder(settings: Settings) -> Embedder:
 
 def build_rag(settings: Settings, store: Store, llm: LlmClient) -> RagContext:
     embedder = build_embedder(settings)
-    if settings.seed_fixtures and store.count_filings() == 0:
-        Ingestor(store, embedder).ingest_fixtures()
+    if settings.seed_fixtures:
+        with getattr(store, "seed_lock", nullcontext)():
+            if store.count_filings() == 0:
+                Ingestor(store, embedder).ingest_fixtures()
     return RagContext(store=store, embedder=embedder, llm=llm, top_k=settings.top_k,
                       strong_model=settings.llm_strong_model or None,
                       mcp_transport=settings.mcp_transport, mcp_url=settings.mcp_url)
@@ -84,4 +90,6 @@ def build_container(settings: Settings) -> Container:
         ingestor=Ingestor(store, rag.embedder),
         rag=rag,
         persistent=persistent,
+        ask_limiter=RateLimiter(settings.rate_limit_ask),
+        ingest_limiter=RateLimiter(settings.rate_limit_ingest),
     )

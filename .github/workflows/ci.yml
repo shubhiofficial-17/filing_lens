@@ -58,7 +58,7 @@ jobs:
       - run: npm run test:ci
       - run: npx ng build --configuration production
 
-  compose:
+  e2e:
     runs-on: ubuntu-latest
     needs: [api, web]
     steps:
@@ -66,7 +66,7 @@ jobs:
       - run: docker compose up --build -d
       - name: Wait for the stack through nginx
         run: |
-          for i in $(seq 1 60); do
+          for i in $(seq 1 90); do
             if curl -fsS http://localhost:8080/api/health/ready; then
               echo
               exit 0
@@ -75,7 +75,29 @@ jobs:
           done
           docker compose logs
           exit 1
-      - name: Web app is served
-        run: curl -fsS http://localhost:8080/ | grep -q "<app-root"
+      - name: MCP server answers over streamable HTTP
+        run: |
+          curl -fsS -X POST http://localhost:8001/mcp \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json, text/event-stream" \
+            -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}' \
+            | grep -q FilingLens
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Playwright
+        working-directory: e2e
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npx playwright test
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          if-no-files-found: ignore
       - if: always()
         run: docker compose down -v

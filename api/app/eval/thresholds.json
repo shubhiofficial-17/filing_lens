@@ -25,5 +25,10 @@
     "accuracy": 0.85,
     "retrieval_recall": 0.95,
     "injection_safe": 1.0
+  },
+  "mcp_agent": {
+    "accuracy": 0.86,
+    "retrieval_recall": 0.95,
+    "injection_safe": 1.0
   }
 }

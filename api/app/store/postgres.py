@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator
+from contextlib import contextmanager
 
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
@@ -96,6 +98,19 @@ class PostgresStore:
 
     def close(self) -> None:
         self._pool.close()
+
+    @contextmanager
+    def seed_lock(self) -> Iterator[None]:
+        """Held while loading fixtures, so the API and the MCP server starting together
+        don't both ingest into an empty database."""
+        with self._pool.connection() as conn:
+            conn.execute("SELECT pg_advisory_lock(7202)")
+            conn.commit()
+            try:
+                yield
+            finally:
+                conn.execute("SELECT pg_advisory_unlock(7202)")
+                conn.commit()
 
     def schema(self) -> str:
         return SCHEMA.format(dim=self._dim)
