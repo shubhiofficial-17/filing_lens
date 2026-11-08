@@ -87,8 +87,17 @@ class AgenticRag(GraphRag):
         "verifies every cited sentence before answering."
     )
 
+    answer_model: str | None = None  # None = the default model
+
     def run(self, question: str, filt: SearchFilter | None = None) -> Answer:
         trace = Trace()
+        text, evidence, _ = self.research_and_answer(question, filt, trace)
+        return self.finish(question, text, evidence, trace)
+
+    def research_and_answer(
+        self, question: str, filt: SearchFilter | None, trace: Trace
+    ) -> tuple[str, list[Hit], list]:
+        """Plan, research every step, answer and verify. Returns (text, evidence, facts)."""
         catalog = self.ctx.catalog
         steps = self.plan(question, filt, trace)
 
@@ -103,15 +112,22 @@ class AgenticRag(GraphRag):
         with trace.step("merge evidence") as d:
             evidence = round_robin(groups, MAX_EXCERPTS)
             d["hits"] = summarise_hits(evidence)
-        with trace.step("generate answer"):
+        text = self.answer_and_verify(question, evidence, facts_as_notes(facts, evidence), trace)
+        return text, evidence, facts
+
+    def answer_and_verify(
+        self, question: str, evidence: list[Hit], notes: str, trace: Trace
+    ) -> str:
+        with trace.step("generate answer", self.answer_model or "default model"):
             draft = trace.record(generate_answer(
-                self.ctx.llm, question, evidence, catalog, notes=facts_as_notes(facts, evidence)
+                self.ctx.llm, question, evidence, self.ctx.catalog, notes=notes,
+                model=self.answer_model,
             ))
         with trace.step("verify citations") as d:
             text, checks = verify_answer(draft.text, evidence)
             d["checks"] = [{"sentence": c.sentence, "status": c.status} for c in checks]
             d["removed"] = sum(c.status == "removed" for c in checks)
-        return self.finish(question, text, evidence, trace)
+        return text
 
     def plan(self, question: str, filt: SearchFilter | None, trace: Trace) -> list[Step]:
         catalog = self.ctx.catalog

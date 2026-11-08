@@ -92,7 +92,8 @@ def faithfulness(a: Answer) -> float | None:
     A sentence without a citation counts as unsupported. Refusals are not scored."""
     if NO_ANSWER.lower() in a.text.lower():
         return None
-    claims = sentences(a.text)
+    # "Calculated: ..." sentences are arithmetic done in code on cited inputs, not claims.
+    claims = [s for s in sentences(a.text) if not s.startswith("Calculated:")]
     if not claims:
         return None
     by_marker: dict[int, str] = {}

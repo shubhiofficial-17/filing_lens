@@ -101,6 +101,29 @@ class DemoLlm:
     def _task_plan(self, user: str) -> str:
         return json.dumps({"steps": plan(tag(user, "question"), tag(user, "corpus"))})
 
+    def _task_route(self, user: str) -> str:
+        from app.agents.patterns import COMPLEX_WORDS
+
+        question = tag(user, "question")
+        return json.dumps({"route": "complex" if COMPLEX_WORDS.search(question) else "simple"})
+
+    def _task_critique(self, user: str) -> str:
+        question, draft = tag(user, "question"), tag(user, "draft")
+        found = {e.n: e for e in parse_excerpts(tag(user, "excerpts"))}
+        companies = dict(
+            (m.group(2), m.group(1))
+            for m in re.finditer(r"([^,]+?) \(([A-Z.]+)\)", tag(user, "companies"))
+        )
+        words = {re.sub(r"'s$", "", w.strip("?,.").lower()) for w in question.split()}
+        tickers = [t for t, n in companies.items()
+                   if company_key(n.strip()) in words or t.lower() in words]
+        years = years_in(question) or [None]
+        cited = {(found[int(n)].ticker, found[int(n)].year)
+                 for n in re.findall(r"\[(\d+)\]", draft) if int(n) in found}
+        missing = [{"ticker": t, "year": y} for t in tickers for y in years
+                   if not any(c[0] == t and (y is None or c[1] == y) for c in cited)]
+        return json.dumps({"missing": missing, "issues": []})
+
     def _task_assess(self, user: str) -> str:
         query = tag(user, "question")
         picked = pick_sentences(query, parse_excerpts(tag(user, "excerpts")))

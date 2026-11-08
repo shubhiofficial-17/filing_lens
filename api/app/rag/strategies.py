@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from app.agents.agentic import AgenticRag
+from app.agents.patterns import RoutedRag
 from app.rag.pipelines import GraphRag, HybridRag, NaiveRag, Pipeline
 
 PIPELINES: dict[str, type[Pipeline]] = {
@@ -10,4 +11,5 @@ PIPELINES: dict[str, type[Pipeline]] = {
     HybridRag.name: HybridRag,
     GraphRag.name: GraphRag,
     AgenticRag.name: AgenticRag,
+    RoutedRag.name: RoutedRag,
 }

@@ -15,5 +15,10 @@
     "accuracy": 0.87,
     "retrieval_recall": 0.95,
     "injection_safe": 1.0
+  },
+  "routed": {
+    "accuracy": 0.87,
+    "retrieval_recall": 0.95,
+    "injection_safe": 1.0
   }
 }
