@@ -43,3 +43,15 @@ def answer_messages(
     if notes:
         user += f"\n<notes>{notes}</notes>"
     return [{"role": "system", "content": ANSWER_SYSTEM}, {"role": "user", "content": user}]
+
+
+RERANK_SYSTEM = f"""TASK: rerank
+Grade how well each numbered passage helps answer the question, from 0 (useless) to 10
+(directly answers it). Reply with JSON only:
+{{"grades": [{{"passage": 1, "score": 7}}, ...]}}
+{DATA_RULE}"""
+
+
+def rerank_messages(question: str, hits: list[Hit], catalog: Catalog) -> list[dict[str, str]]:
+    user = f"<question>{question}</question>\n<excerpts>\n{excerpts(hits, catalog)}\n</excerpts>"
+    return [{"role": "system", "content": RERANK_SYSTEM}, {"role": "user", "content": user}]

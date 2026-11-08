@@ -1,3 +1,10 @@
 {
-  "naive": {"accuracy": 0.45, "retrieval_recall": 0.75}
+  "naive": {
+    "accuracy": 0.45,
+    "retrieval_recall": 0.75
+  },
+  "hybrid": {
+    "accuracy": 0.82,
+    "retrieval_recall": 0.95
+  }
 }

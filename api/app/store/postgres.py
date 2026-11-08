@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
@@ -47,6 +49,10 @@ CREATE TABLE IF NOT EXISTS chunks (
 );
 CREATE INDEX IF NOT EXISTS chunks_filter ON chunks (ticker, fiscal_year, item);
 CREATE INDEX IF NOT EXISTS chunks_embedding ON chunks USING hnsw (embedding vector_cosine_ops);
+
+ALTER TABLE chunks ADD COLUMN IF NOT EXISTS tsv tsvector
+    GENERATED ALWAYS AS (to_tsvector('english', index_text)) STORED;
+CREATE INDEX IF NOT EXISTS chunks_tsv ON chunks USING gin (tsv);
 """
 
 _CHUNK_COLS = "id, section_id, filing_id, ticker, fiscal_year, item, text, kind"
@@ -179,6 +185,23 @@ class PostgresStore:
             rows = cur.execute(sql, params).fetchall()
         return [Hit(_chunk(r), float(r["score"]), "vector") for r in rows]
 
+    def keyword_search(self, query: str, k: int, filt: SearchFilter | None = None) -> list[Hit]:
+        tsquery = _or_query(query)
+        if not tsquery:
+            return []
+        where, params = _where(filt)
+        params.update(q=tsquery, k=k)
+        # ts_rank_cd with normalisation 1 divides by 1 + log(length), like BM25's length
+        # penalty. OR semantics: a chunk matching some of the words still counts.
+        sql = (
+            f"SELECT {_CHUNK_COLS}, ts_rank_cd(tsv, query, 1) AS score"
+            f" FROM chunks, to_tsquery('english', %(q)s) AS query"
+            f" WHERE {where} AND tsv @@ query ORDER BY score DESC, id LIMIT %(k)s"
+        )
+        with self._pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            rows = cur.execute(sql, params).fetchall()
+        return [Hit(_chunk(r), float(r["score"]), "bm25") for r in rows]
+
     # --- shared helpers --------------------------------------------------------------
     @property
     def pool(self) -> ConnectionPool:
@@ -222,3 +245,12 @@ def _where(filt: SearchFilter | None) -> tuple[str, dict]:
         clauses.append("item = ANY(%(items)s)")
         params["items"] = list(filt.items)
     return " AND ".join(clauses), params
+
+
+def _or_query(text: str) -> str:
+    """'Who is the CEO?' -> 'ceo' ; only [a-z0-9] words, so the tsquery syntax can't break."""
+    from app.text import STOPWORDS
+
+    words = [w for w in re.findall(r"[a-z0-9]+", text.lower().replace(",", "")) if
+             w not in STOPWORDS and len(w) > 1]
+    return " | ".join(dict.fromkeys(words))

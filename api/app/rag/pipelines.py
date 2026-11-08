@@ -82,3 +82,60 @@ class NaiveRag(Pipeline):
                 generate_answer(self.ctx.llm, question, hits, self.ctx.catalog)
             )
         return self.finish(question, completion.text, hits, trace)
+
+
+def merge_filters(inferred: SearchFilter, given: SearchFilter | None) -> SearchFilter:
+    """Filters the caller set win; filters inferred from the question fill the gaps."""
+    if given is None:
+        return inferred
+    return SearchFilter(
+        tickers=given.tickers or inferred.tickers,
+        years=given.years or inferred.years,
+        items=given.items or inferred.items,
+    )
+
+
+class HybridRag(Pipeline):
+    name = "hybrid"
+    title = "Hybrid + rerank"
+    description = (
+        "Query understanding (companies, years, glossary rewrite), vector + BM25 search fused "
+        "with reciprocal rank fusion, reranked, with coverage for every company and year asked."
+    )
+
+    def retrieve(self, question: str, filt: SearchFilter | None, trace: Trace) -> list[Hit]:
+        from app.rag.query import rewrite
+        from app.rag.retrieval import (
+            LexicalReranker,
+            coverage_groups,
+            hybrid_search,
+            select_with_coverage,
+        )
+
+        catalog = self.ctx.catalog
+        with trace.step("understand question") as d:
+            inferred = merge_filters(catalog.understand(question), filt)
+            query = rewrite(question)
+            d.update(tickers=list(inferred.tickers or []), years=list(inferred.years or []),
+                     query=query)
+        with trace.step("hybrid search", "vector + BM25, reciprocal rank fusion") as d:
+            fused, vec, kw = hybrid_search(self.ctx.store, self.ctx.embedder, query, inferred)
+            if not fused and (inferred.tickers or inferred.years):
+                # The inferred filter was too strict (e.g. a year we don't have): search wide.
+                fused, vec, kw = hybrid_search(self.ctx.store, self.ctx.embedder, query, filt)
+            d.update(vector=len(vec), keyword=len(kw), fused=summarise_hits(fused[:10]))
+        reranker = LexicalReranker()
+        with trace.step("rerank", reranker.name) as d:
+            ranked = reranker.rerank(query, fused, catalog)
+            hits = select_with_coverage(ranked, self.ctx.top_k, coverage_groups(inferred))
+            d["hits"] = summarise_hits(hits)
+        return hits
+
+    def run(self, question: str, filt: SearchFilter | None = None) -> Answer:
+        trace = Trace()
+        hits = self.retrieve(question, filt, trace)
+        with trace.step("generate answer"):
+            completion = trace.record(
+                generate_answer(self.ctx.llm, question, hits, self.ctx.catalog)
+            )
+        return self.finish(question, completion.text, hits, trace)

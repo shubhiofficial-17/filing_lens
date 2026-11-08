@@ -2,7 +2,8 @@
 
 from app.fixtures.corpus import fixture_filings
 from app.ingest.service import Ingestor
-from app.models import Filing, Section
+from app.models import Chunk, Filing, SearchFilter, Section
+from app.rag.embeddings import HashingEmbedder
 
 
 def _filing(fid: str = "T-2024", ticker: str = "TST", year: int = 2024) -> Filing:
@@ -44,9 +45,59 @@ def check_fixtures_ingest(store):
     assert store.get_section("NWRB-2024-10K:1A") is not None
 
 
+def _with_chunks(store):
+    texts = {
+        "A-2024:1#0": ("AAA", 2024, "Our chief executive officer is Jane Doe."),
+        "A-2024:7#0": ("AAA", 2024, "Revenue was $10.0 million and HIPAA compliance costs rose."),
+        "B-2024:7#0": ("BBB", 2024, "Revenue was $20.0 million in fiscal 2024."),
+        "B-2025:7#0": ("BBB", 2025, "Revenue was $25.0 million in fiscal 2025."),
+    }
+    for fid in ("A-2024", "B-2024", "B-2025"):
+        ticker, year = ("AAA", 2024) if fid == "A-2024" else ("BBB", int(fid[-4:]))
+        items = sorted({cid.split(":")[1].split("#")[0] for cid in texts if cid.startswith(fid)})
+        store.add_filing(_filing(fid, ticker, year),
+                         [Section(f"{fid}:{i}", fid, i, "T", "x") for i in items])
+    chunks = [Chunk(cid, cid.split("#")[0], cid.split(":")[0], t, y, cid.split(":")[1][0], text)
+              for cid, (t, y, text) in texts.items()]
+    embedder = HashingEmbedder()
+    store.add_chunks(chunks, [c.text for c in chunks], embedder.embed([c.text for c in chunks]))
+    return embedder
+
+
+def check_vector_search_ranks_and_filters(store):
+    embedder = _with_chunks(store)
+    q = embedder.embed(["revenue in fiscal 2025"])[0]
+    hits = store.vector_search(q, 2)
+    assert hits[0].chunk.id == "B-2025:7#0"
+    assert len(hits) == 2 and hits[0].score >= hits[1].score
+    only_a = store.vector_search(q, 5, SearchFilter(tickers=("AAA",)))
+    assert {h.chunk.ticker for h in only_a} == {"AAA"}
+    assert store.count_chunks() == 4
+    assert [c.id for c in store.get_chunks(["B-2024:7#0", "nope", "A-2024:1#0"])] == [
+        "B-2024:7#0", "A-2024:1#0"]
+
+
+def check_keyword_search_finds_exact_terms(store):
+    _with_chunks(store)
+    hits = store.keyword_search("HIPAA compliance", 3)
+    assert hits and hits[0].chunk.id == "A-2024:7#0"
+    years = store.keyword_search("revenue", 5, SearchFilter(years=(2025,)))
+    assert [h.chunk.id for h in years] == ["B-2025:7#0"]
+    assert store.keyword_search("the of and", 5) == []
+
+
+def check_reingesting_a_filing_drops_its_chunks(store):
+    _with_chunks(store)
+    store.add_filing(_filing("B-2025", "BBB", 2025), [])
+    assert store.count_chunks() == 3
+
+
 CHECKS = [
     check_add_and_read_back,
     check_adding_again_replaces,
     check_list_is_ordered_by_ticker_then_year,
     check_fixtures_ingest,
+    check_vector_search_ranks_and_filters,
+    check_keyword_search_finds_exact_terms,
+    check_reingesting_a_filing_drops_its_chunks,
 ]

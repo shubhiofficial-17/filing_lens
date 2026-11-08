@@ -37,3 +37,6 @@ class Store(Protocol):
         self, vector: list[float], k: int, filt: SearchFilter | None = None
     ) -> list[Hit]:
         """Nearest chunks by cosine similarity, best first."""
+
+    def keyword_search(self, query: str, k: int, filt: SearchFilter | None = None) -> list[Hit]:
+        """Full-text (BM25-style) search, best first."""

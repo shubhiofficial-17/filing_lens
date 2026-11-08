@@ -20,17 +20,15 @@ from dataclasses import dataclass
 from app.llm.base import Completion, Message, estimate_tokens
 from app.models import Usage
 from app.rag.prompts import NO_ANSWER
+from app.rag.query import GLOSSARY
 from app.text import sentences, terms, years_in
 
 _HEADER_RE = re.compile(r"^\[(\d+)\] (.+?) \(([A-Z.]+)\), fiscal (\d{4}), Item (\w+)", re.M)
 _TAG_RE = r"<{0}>(.*?)</{0}>"
-# The little "world knowledge" the demo model has: common abbreviations in filings.
-ABBREVIATIONS = {
-    "ceo": "chief executive officer",
-    "cfo": "chief financial officer",
-    "r&d": "research and development",
-    "md&a": "management's discussion and analysis",
-}
+# The little "world knowledge" the demo model has: the same glossary query rewriting uses
+# (CEO = chief executive officer, profit = net income, ...). A real model knows far more.
+ABBREVIATIONS = GLOSSARY
+QUANTITY = re.compile(r"\b(how much|how many|what was|what percentage|how large)\b", re.I)
 MULTI_PART = re.compile(
     r"\b(compare|compared|change|changed|differ|difference|versus|vs\.?|higher|lower|both|"
     r"each|between|from \d{4} to|and who|and what|and how)\b",
@@ -119,6 +117,8 @@ def score_sentence(
     keys = {company_key(excerpt.company), excerpt.ticker.lower()}
     if mentioned and not keys & mentioned:
         score *= 0.3
+    if QUANTITY.search(question) and re.search(r"\d[\d,]*\.\d|\d+%|\d{1,3},\d{3}", sentence):
+        score += 1.5
     if sentence.startswith("|"):
         score *= 0.8
     if len(sentence.split()) < 5:
@@ -161,10 +161,13 @@ def pick_sentences(question: str, found: list[Excerpt]) -> list[tuple[int, str, 
 
     best = scored[0]
     picked = [(best[1], prose(best[1], best[2]), best[0])]
+    runner_up = next((t for t in scored[1:] if prose(t[1], t[2]) != picked[0][1]), None)
+    if runner_up and runner_up[0] >= 0.75 * best[0]:
+        picked.append((runner_up[1], prose(runner_up[1], runner_up[2]), runner_up[0]))
     if MULTI_PART.search(question) or len(set(years_in(question))) > 1:
         groups = {(best[3].ticker, best[3].year)}
         for score, n, s, e in scored[1:]:
-            if len(picked) >= 3 or score < 0.5 * best[0]:
+            if len(picked) >= 4 or score < 0.5 * best[0]:
                 break
             text = prose(n, s)
             if (e.ticker, e.year) not in groups and all(text != p[1] for p in picked):

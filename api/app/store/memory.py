@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 
 from app.models import Chunk, Filing, Hit, SearchFilter, Section
+from app.rag.bm25 import Bm25Index
 from app.rag.embeddings import cosine
 
 
@@ -14,6 +15,7 @@ class InMemoryStore:
         self._chunks: dict[str, Chunk] = {}
         self._index_text: dict[str, str] = {}
         self._vectors: dict[str, list[float]] = {}
+        self._bm25 = Bm25Index()
 
     def add_filing(self, filing: Filing, sections: list[Section]) -> None:
         with self._lock:
@@ -47,12 +49,14 @@ class InMemoryStore:
                 self._chunks[chunk.id] = chunk
                 self._index_text[chunk.id] = text
                 self._vectors[chunk.id] = vec
+                self._bm25.add(chunk.id, text)
 
     def _drop_chunks(self, filing_id: str) -> None:
         for cid in [c.id for c in self._chunks.values() if c.filing_id == filing_id]:
             self._chunks.pop(cid, None)
             self._index_text.pop(cid, None)
             self._vectors.pop(cid, None)
+            self._bm25.remove(cid)
 
     def count_chunks(self) -> int:
         return len(self._chunks)
@@ -72,3 +76,11 @@ class InMemoryStore:
             ]
         scored.sort(key=lambda t: (-t[0], t[1]))
         return [Hit(self._chunks[cid], score, "vector") for score, cid in scored[:k]]
+
+    def keyword_search(self, query: str, k: int, filt: SearchFilter | None = None) -> list[Hit]:
+        filt = filt or SearchFilter()
+        with self._lock:
+            allowed = {cid for cid, c in self._chunks.items() if filt.allows(c)}
+            scores = self._bm25.scores(query, allowed)
+        ranked = sorted(scores, key=lambda cid: (-scores[cid], cid))[:k]
+        return [Hit(self._chunks[cid], scores[cid], "bm25") for cid in ranked]
