@@ -8,6 +8,7 @@ import logging
 from dataclasses import dataclass
 
 from app.fixtures.corpus import fixture_filings
+from app.graph.extract import Extractor, RuleExtractor
 from app.ingest.edgar import EdgarClient
 from app.ingest.parser import parse_filing_html
 from app.models import Filing, Section
@@ -34,9 +35,12 @@ class IngestResult:
 
 
 class Ingestor:
-    def __init__(self, store: Store, embedder: Embedder | None = None) -> None:
+    def __init__(
+        self, store: Store, embedder: Embedder | None = None, extractor: Extractor | None = None
+    ) -> None:
         self._store = store
         self._embedder = embedder or HashingEmbedder()
+        self._extractor = extractor or RuleExtractor()
 
     def ingest_html(self, filing: Filing, html: str) -> IngestResult:
         sections = [s for s in parse_filing_html(html, filing.id) if s.item in KEPT_ITEMS]
@@ -58,6 +62,8 @@ class Ingestor:
                 texts.append(index_text(chunk, filing.company, section.title))
         if chunks:
             self._store.add_chunks(chunks, texts, self._embedder.embed(texts))
+            graph = self._extractor.extract(filing.company, chunks)
+            self._store.add_graph(filing.id, graph.entities, graph.relations)
         return len(chunks)
 
     def ingest_fixtures(self) -> list[IngestResult]:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import threading
 
-from app.models import Chunk, Filing, Hit, SearchFilter, Section
+from app.models import Chunk, Entity, Filing, Hit, Relation, SearchFilter, Section
 from app.rag.bm25 import Bm25Index
 from app.rag.embeddings import cosine
 
@@ -16,10 +16,13 @@ class InMemoryStore:
         self._index_text: dict[str, str] = {}
         self._vectors: dict[str, list[float]] = {}
         self._bm25 = Bm25Index()
+        self._entities: dict[str, Entity] = {}
+        self._relations: dict[str, list[Relation]] = {}  # by filing id
 
     def add_filing(self, filing: Filing, sections: list[Section]) -> None:
         with self._lock:
             self._drop_chunks(filing.id)
+            self._relations.pop(filing.id, None)
             self._filings[filing.id] = filing
             self._sections[filing.id] = list(sections)
 
@@ -84,3 +87,23 @@ class InMemoryStore:
             scores = self._bm25.scores(query, allowed)
         ranked = sorted(scores, key=lambda cid: (-scores[cid], cid))[:k]
         return [Hit(self._chunks[cid], scores[cid], "bm25") for cid in ranked]
+
+    # --- knowledge graph --------------------------------------------------------------
+    def add_graph(self, filing_id: str, entities: list[Entity], relations: list[Relation]) -> None:
+        with self._lock:
+            for e in entities:
+                self._entities.setdefault(e.id, e)
+            self._relations[filing_id] = list(relations)
+
+    def list_entities(self) -> list[Entity]:
+        return sorted(self._entities.values(), key=lambda e: e.id)
+
+    def relations_for(self, entity_ids: list[str]) -> list[Relation]:
+        wanted = set(entity_ids)
+        with self._lock:
+            out = [r for rels in self._relations.values() for r in rels
+                   if r.source_id in wanted or r.target_id in wanted]
+        return sorted(out, key=lambda r: (r.source_id, r.relation, r.target_id, r.fiscal_year))
+
+    def count_relations(self) -> int:
+        return sum(len(r) for r in self._relations.values())

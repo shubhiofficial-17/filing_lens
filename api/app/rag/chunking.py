@@ -59,6 +59,7 @@ def chunk_section(section: Section, filing: Filing, max_words: int = MAX_WORDS) 
             item=section.item,
             text=text,
             kind=kind,
+            company=filing.company,
         )
         for i, (kind, text) in enumerate(pieces)
     ]

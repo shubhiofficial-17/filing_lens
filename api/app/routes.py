@@ -135,3 +135,24 @@ def eval_report(full: bool = False) -> dict:
         for data in report.get("strategies", {}).values():
             data.pop("scores", None)
     return report
+
+
+# --- knowledge graph -----------------------------------------------------------------------
+@router.get("/graph")
+def graph(request: Request, q: str = "") -> dict:
+    """Entities mentioned in `q` with the facts around them; without `q`, graph totals."""
+    rag = _container(request).rag
+    store = rag.store
+    if not q:
+        return {"entities": len(store.list_entities()), "relations": store.count_relations()}
+    result = rag.graph.expand(q[:500], max_facts=20)
+    return {
+        "entities": [asdict(e) for e in result.mentioned],
+        "bridges": result.bridge_tickers,
+        "facts": [
+            {"text": f.text(), "relation": f.relation.relation, "source": f.source.name,
+             "target": f.target.name, "fiscal_year": f.relation.fiscal_year,
+             "chunk_id": f.relation.chunk_id, "hop": f.hop}
+            for f in result.facts
+        ],
+    }

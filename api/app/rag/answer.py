@@ -42,7 +42,7 @@ def parse_citations(answer: str, hits: list[Hit]) -> list[Citation]:
                 fiscal_year=chunk.fiscal_year,
                 item=chunk.item,
                 quote=best_quote(claim, chunk.text),
-                supported=is_supported(claim, chunk.text),
+                supported=is_supported(claim, chunk.evidence()),
             )
     return [out[k] for k in sorted(out)]
 

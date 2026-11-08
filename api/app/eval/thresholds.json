@@ -6,5 +6,9 @@
   "hybrid": {
     "accuracy": 0.82,
     "retrieval_recall": 0.95
+  },
+  "graph": {
+    "accuracy": 0.86,
+    "retrieval_recall": 0.95
   }
 }

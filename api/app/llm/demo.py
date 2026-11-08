@@ -98,10 +98,38 @@ class DemoLlm:
     def _task_answer(self, user: str) -> str:
         question = tag(user, "question")
         found = parse_excerpts(tag(user, "excerpts"))
-        picked = pick_sentences(question, found)
-        if not picked:
+        names = {t for e in found for t in terms(e.company)}
+        facts = pick_facts(question, tag(user, "notes"), names)
+        # Facts answer part of the question; look for sentences that answer the rest.
+        covered = {t for _, f in facts for t in terms(f.split(", per its")[0])}
+        picked = pick_sentences(question, found, covered)
+        if facts:
+            # Facts first; then at most two sentences that add something new.
+            known = " ".join(f for _, f in facts).lower()
+            picked = [p for p in picked if p[1].lower() not in known][:2]
+        if not picked and not facts:
             return NO_ANSWER
-        return " ".join(f"{s.rstrip('.')} [{n}]." for n, s, _ in picked)
+        parts = [f"{f.rstrip('.')} [{n}]." for n, f in facts]
+        parts += [f"{s.rstrip('.')} [{n}]." for n, s, _ in picked]
+        return " ".join(parts)
+
+
+_FACT_RE = re.compile(r"^- (?P<fact>.+?) \[(?P<n>\d+)\]$", re.M)
+
+
+def pick_facts(
+    question: str, notes: str, ignore: set[str], limit: int = 3
+) -> list[tuple[int, str]]:
+    """Graph facts from the notes that share at least two terms with the question."""
+    q_terms = set(terms(expand_abbreviations(question))) - ignore
+    scored = []
+    for m in _FACT_RE.finditer(notes):
+        fact = m.group("fact")
+        overlap = len(q_terms & set(terms(fact.split(", per its")[0])))
+        if overlap >= 2:
+            scored.append((overlap, int(m.group("n")), fact))
+    scored.sort(key=lambda t: (-t[0], t[1]))
+    return [(n, fact) for _, n, fact in scored[:limit]]
 
 
 def score_sentence(
@@ -140,12 +168,16 @@ def mentioned_companies(question: str, found: list[Excerpt]) -> set[str]:
     return words & keys
 
 
-def pick_sentences(question: str, found: list[Excerpt]) -> list[tuple[int, str, float]]:
+def pick_sentences(
+    question: str, found: list[Excerpt], covered: set[str] | None = None
+) -> list[tuple[int, str, float]]:
     expanded = expand_abbreviations(question)
     # Company names are matched through the excerpt header, not sentence by sentence;
     # otherwise "X is headquartered in Y" wins every question about X.
     name_terms = {t for e in found for t in terms(e.company)}
     q_terms = set(terms(expanded)) - name_terms
+    if covered and len(q_terms - covered) >= 2:
+        q_terms -= covered
     mentioned = mentioned_companies(question, found)
     headers = {e.n: _table_header(e.text) for e in found}
     scored: list[tuple[float, int, str, Excerpt]] = []

@@ -92,6 +92,22 @@ def check_reingesting_a_filing_drops_its_chunks(store):
     assert store.count_chunks() == 3
 
 
+def check_graph_is_replaced_per_filing(store):
+    from app.models import Entity, Relation
+
+    store.add_filing(_filing("A-2024", "AAA", 2024), [])
+    store.add_filing(_filing("A-2025", "AAA", 2025), [])
+    a = Entity("a", "A Inc.", "company")
+    b, c = Entity("b", "B", "person"), Entity("c", "C", "person")
+    store.add_graph("A-2024", [a, b], [Relation("a", "CEO", "b", "A-2024", 2024, "x")])
+    store.add_graph("A-2025", [a, c], [Relation("a", "CEO", "c", "A-2025", 2025, "y")])
+    assert [r.target_id for r in store.relations_for(["a"])] == ["b", "c"]
+    store.add_graph("A-2025", [a, c], [])
+    assert [r.target_id for r in store.relations_for(["c", "b"])] == ["b"]
+    assert store.count_relations() == 1
+    assert [e.id for e in store.list_entities()] == ["a", "b", "c"]
+
+
 CHECKS = [
     check_add_and_read_back,
     check_adding_again_replaces,
@@ -100,4 +116,5 @@ CHECKS = [
     check_vector_search_ranks_and_filters,
     check_keyword_search_finds_exact_terms,
     check_reingesting_a_filing_drops_its_chunks,
+    check_graph_is_replaced_per_filing,
 ]

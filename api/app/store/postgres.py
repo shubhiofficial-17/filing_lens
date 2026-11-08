@@ -7,7 +7,7 @@ import re
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
-from app.models import Chunk, Filing, Hit, SearchFilter, Section
+from app.models import Chunk, Entity, Filing, Hit, Relation, SearchFilter, Section
 
 SCHEMA = """
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -53,9 +53,29 @@ CREATE INDEX IF NOT EXISTS chunks_embedding ON chunks USING hnsw (embedding vect
 ALTER TABLE chunks ADD COLUMN IF NOT EXISTS tsv tsvector
     GENERATED ALWAYS AS (to_tsvector('english', index_text)) STORED;
 CREATE INDEX IF NOT EXISTS chunks_tsv ON chunks USING gin (tsv);
+ALTER TABLE chunks ADD COLUMN IF NOT EXISTS company text NOT NULL DEFAULT '';
+
+CREATE TABLE IF NOT EXISTS entities (
+    id   text PRIMARY KEY,
+    name text NOT NULL,
+    kind text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS relations (
+    source_id   text NOT NULL REFERENCES entities (id),
+    relation    text NOT NULL,
+    target_id   text NOT NULL REFERENCES entities (id),
+    filing_id   text NOT NULL REFERENCES filings (id) ON DELETE CASCADE,
+    fiscal_year int  NOT NULL,
+    chunk_id    text NOT NULL,
+    detail      text NOT NULL DEFAULT '',
+    PRIMARY KEY (source_id, relation, target_id, filing_id)
+);
+CREATE INDEX IF NOT EXISTS relations_source ON relations (source_id);
+CREATE INDEX IF NOT EXISTS relations_target ON relations (target_id);
 """
 
-_CHUNK_COLS = "id, section_id, filing_id, ticker, fiscal_year, item, text, kind"
+_CHUNK_COLS = "id, section_id, filing_id, ticker, fiscal_year, item, text, kind, company"
 
 
 class PostgresStore:
@@ -90,7 +110,7 @@ class PostgresStore:
     def reset(self) -> None:
         """Delete everything. Used by tests."""
         with self._pool.connection() as conn:
-            conn.execute("TRUNCATE filings CASCADE")
+            conn.execute("TRUNCATE filings, entities CASCADE")
 
     # --- filings and sections --------------------------------------------------------
     def add_filing(self, filing: Filing, sections: list[Section]) -> None:
@@ -142,14 +162,14 @@ class PostgresStore:
     ) -> None:
         rows = [
             (c.id, c.section_id, c.filing_id, c.ticker, c.fiscal_year, c.item, c.kind, n, c.text,
-             text, _vector(vec))
+             text, _vector(vec), c.company)
             for n, (c, text, vec) in enumerate(zip(chunks, index_texts, vectors, strict=True))
         ]
         with self._pool.connection() as conn, conn.transaction(), conn.cursor() as cur:
             cur.executemany(
                 "INSERT INTO chunks (id, section_id, filing_id, ticker, fiscal_year, item, kind,"
-                " position, text, index_text, embedding)"
-                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::vector)"
+                " position, text, index_text, embedding, company)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::vector, %s)"
                 " ON CONFLICT (id) DO UPDATE SET text = EXCLUDED.text,"
                 " index_text = EXCLUDED.index_text, embedding = EXCLUDED.embedding",
                 rows,
@@ -202,6 +222,42 @@ class PostgresStore:
             rows = cur.execute(sql, params).fetchall()
         return [Hit(_chunk(r), float(r["score"]), "bm25") for r in rows]
 
+    # --- knowledge graph --------------------------------------------------------------
+    def add_graph(self, filing_id: str, entities: list[Entity], relations: list[Relation]) -> None:
+        with self._pool.connection() as conn, conn.transaction(), conn.cursor() as cur:
+            cur.executemany(
+                "INSERT INTO entities (id, name, kind) VALUES (%s, %s, %s)"
+                " ON CONFLICT (id) DO NOTHING",
+                [(e.id, e.name, e.kind) for e in entities],
+            )
+            cur.execute("DELETE FROM relations WHERE filing_id = %s", (filing_id,))
+            cur.executemany(
+                "INSERT INTO relations (source_id, relation, target_id, filing_id, fiscal_year,"
+                " chunk_id, detail) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                " ON CONFLICT DO NOTHING",
+                [(r.source_id, r.relation, r.target_id, r.filing_id, r.fiscal_year, r.chunk_id,
+                  r.detail) for r in relations],
+            )
+
+    def list_entities(self) -> list[Entity]:
+        with self._pool.connection() as conn:
+            rows = conn.execute("SELECT id, name, kind FROM entities ORDER BY id").fetchall()
+        return [Entity(*r) for r in rows]
+
+    def relations_for(self, entity_ids: list[str]) -> list[Relation]:
+        with self._pool.connection() as conn:
+            rows = conn.execute(
+                "SELECT source_id, relation, target_id, filing_id, fiscal_year, chunk_id, detail"
+                " FROM relations WHERE source_id = ANY(%(ids)s) OR target_id = ANY(%(ids)s)"
+                " ORDER BY source_id, relation, target_id, fiscal_year",
+                {"ids": list(entity_ids)},
+            ).fetchall()
+        return [Relation(*r) for r in rows]
+
+    def count_relations(self) -> int:
+        with self._pool.connection() as conn:
+            return conn.execute("SELECT count(*) FROM relations").fetchone()[0]
+
     # --- shared helpers --------------------------------------------------------------
     @property
     def pool(self) -> ConnectionPool:
@@ -224,7 +280,7 @@ def _section(r: dict) -> Section:
 def _chunk(r: dict) -> Chunk:
     return Chunk(id=r["id"], section_id=r["section_id"], filing_id=r["filing_id"],
                  ticker=r["ticker"], fiscal_year=r["fiscal_year"], item=r["item"],
-                 text=r["text"], kind=r["kind"])
+                 text=r["text"], kind=r["kind"], company=r["company"])
 
 
 def _vector(vec: list[float]) -> str:

@@ -46,3 +46,11 @@ def test_eval_report_is_served_without_per_question_scores(client):
     assert "naive" in report["strategies"]
     assert "scores" not in report["strategies"]["naive"]
     assert "overall" in report["strategies"]["naive"]
+
+
+def test_graph_endpoint(client):
+    totals = client.get("/api/graph").json()
+    assert totals["relations"] > 50
+    body = client.get("/api/graph", params={"q": "Who owns SunSpan Brasil?"}).json()
+    assert body["bridges"] == ["SLEH"]
+    assert body["facts"][0]["relation"] == "OWNS"

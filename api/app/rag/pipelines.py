@@ -7,6 +7,7 @@ and use evidence, so the evaluation can compare them on equal terms.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from app.llm.base import LlmClient
 from app.models import Answer, Hit, SearchFilter
@@ -15,6 +16,9 @@ from app.rag.catalog import Catalog
 from app.rag.embeddings import Embedder
 from app.rag.trace import Trace
 from app.store.base import Store
+
+if TYPE_CHECKING:
+    from app.graph.retrieve import Graph
 
 
 @dataclass
@@ -26,6 +30,8 @@ class RagContext:
     strong_model: str | None = None
     _catalog: Catalog | None = field(default=None, repr=False)
     _catalog_size: int = -1
+    _graph: Graph | None = field(default=None, repr=False)
+    _graph_size: tuple[int, int] = (-1, -1)
 
     @property
     def catalog(self) -> Catalog:
@@ -34,6 +40,16 @@ class RagContext:
             self._catalog = Catalog.build(self.store)
             self._catalog_size = size
         return self._catalog
+
+    @property
+    def graph(self) -> Graph:
+        from app.graph.retrieve import Graph
+
+        size = (self.store.count_filings(), self.store.count_relations())
+        if self._graph is None or size != self._graph_size:
+            self._graph = Graph(self.store, self.catalog)
+            self._graph_size = size
+        return self._graph
 
 
 def summarise_hits(hits: list[Hit]) -> list[dict]:
@@ -137,5 +153,56 @@ class HybridRag(Pipeline):
         with trace.step("generate answer"):
             completion = trace.record(
                 generate_answer(self.ctx.llm, question, hits, self.ctx.catalog)
+            )
+        return self.finish(question, completion.text, hits, trace)
+
+
+def facts_as_notes(facts: list, hits: list[Hit]) -> str:
+    """Graph facts for the prompt, each pointing at the excerpt it was extracted from."""
+    marker = {h.chunk.id: n for n, h in enumerate(hits, 1)}
+    lines = [
+        f"- {f.text()} [{marker[f.relation.chunk_id]}]"
+        for f in facts if f.relation.chunk_id in marker
+    ]
+    return "Knowledge-graph facts:\n" + "\n".join(lines) if lines else ""
+
+
+class GraphRag(HybridRag):
+    name = "graph"
+    title = "GraphRAG"
+    description = (
+        "Hybrid retrieval plus a knowledge graph of officers, subsidiaries, acquisitions, "
+        "competitors and customers: entities in the question are expanded one or two hops, "
+        "and the graph's facts and their source chunks join the context."
+    )
+    provenance_slots = 3
+
+    def gather(self, question: str, filt: SearchFilter | None, trace: Trace):
+        with trace.step("graph lookup") as d:
+            result = self.ctx.graph.expand(question)
+            d.update(entities=[e.name for e in result.mentioned],
+                     facts=[f.text() for f in result.facts], bridges=result.bridge_tickers)
+        named = self.ctx.catalog.mentioned_tickers(question)
+        if result.bridge_tickers and not named and not (filt and filt.tickers):
+            # The question names no company, but the graph found which ones it is about.
+            filt = SearchFilter(tickers=tuple(result.bridge_tickers),
+                                years=filt.years if filt else None)
+        hits = self.retrieve(question, filt, trace)
+
+        with trace.step("merge graph evidence") as d:
+            fact_chunks = list(dict.fromkeys(f.relation.chunk_id for f in result.facts))
+            provenance = self.ctx.store.get_chunks(fact_chunks[: self.provenance_slots])
+            merged = [Hit(c, 1.0, "graph") for c in provenance]
+            merged += [h for h in hits if h.chunk.id not in {c.id for c in provenance}]
+            merged = merged[: self.ctx.top_k + self.provenance_slots]
+            d["hits"] = summarise_hits(merged)
+        return merged, facts_as_notes(result.facts, merged)
+
+    def run(self, question: str, filt: SearchFilter | None = None) -> Answer:
+        trace = Trace()
+        hits, notes = self.gather(question, filt, trace)
+        with trace.step("generate answer"):
+            completion = trace.record(
+                generate_answer(self.ctx.llm, question, hits, self.ctx.catalog, notes=notes)
             )
         return self.finish(question, completion.text, hits, trace)

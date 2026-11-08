@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from app.models import Chunk, Filing, Hit, SearchFilter, Section
+from app.models import Chunk, Entity, Filing, Hit, Relation, SearchFilter, Section
 
 
 class Store(Protocol):
@@ -40,3 +40,14 @@ class Store(Protocol):
 
     def keyword_search(self, query: str, k: int, filt: SearchFilter | None = None) -> list[Hit]:
         """Full-text (BM25-style) search, best first."""
+
+    # --- knowledge graph --------------------------------------------------------------
+    def add_graph(self, filing_id: str, entities: list[Entity], relations: list[Relation]) -> None:
+        """Replace the relations extracted from one filing (entities are shared)."""
+
+    def list_entities(self) -> list[Entity]: ...
+
+    def relations_for(self, entity_ids: list[str]) -> list[Relation]:
+        """Relations where any of the entities is the source or the target."""
+
+    def count_relations(self) -> int: ...

@@ -43,6 +43,15 @@ class Chunk:
     item: str
     text: str
     kind: str = "text"  # "text" | "table"
+    company: str = ""
+
+    def evidence(self) -> str:
+        """The chunk as the model sees it: where it comes from, then the text.
+
+        Claims are checked against this, so "Northwind's revenue in fiscal 2024 was ..." can
+        be supported by a chunk that only says "Total revenue for fiscal 2024 was ..."."""
+        source = f"{self.company} ({self.ticker})" if self.company else self.ticker
+        return f"{source}, fiscal {self.fiscal_year}, Item {self.item}\n{self.text}"
 
 
 @dataclass(frozen=True)

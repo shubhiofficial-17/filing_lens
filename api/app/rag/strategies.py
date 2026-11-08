@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from app.rag.pipelines import HybridRag, NaiveRag, Pipeline
+from app.rag.pipelines import GraphRag, HybridRag, NaiveRag, Pipeline
 
 PIPELINES: dict[str, type[Pipeline]] = {
     NaiveRag.name: NaiveRag,
     HybridRag.name: HybridRag,
+    GraphRag.name: GraphRag,
 }

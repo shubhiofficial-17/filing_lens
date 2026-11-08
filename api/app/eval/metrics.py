@@ -97,7 +97,7 @@ def faithfulness(a: Answer) -> float | None:
         return None
     by_marker: dict[int, str] = {}
     for n, hit in enumerate(a.retrieved, 1):
-        by_marker[n] = hit.chunk.text
+        by_marker[n] = hit.chunk.evidence()
     supported = 0
     for claim in claims:
         markers = [int(m) for m in _MARKER_RE.findall(claim)]
