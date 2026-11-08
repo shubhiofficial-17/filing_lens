@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from app.models import Filing, Section
+from app.models import Chunk, Filing, Hit, SearchFilter, Section
 
 
 class Store(Protocol):
@@ -22,3 +22,18 @@ class Store(Protocol):
     def get_section(self, section_id: str) -> Section | None: ...
 
     def count_filings(self) -> int: ...
+
+    def add_chunks(
+        self, chunks: list[Chunk], index_texts: list[str], vectors: list[list[float]]
+    ) -> None:
+        """Add chunks of filings already stored. Re-adding a filing drops its old chunks."""
+
+    def count_chunks(self) -> int: ...
+
+    def get_chunks(self, ids: list[str]) -> list[Chunk]:
+        """Chunks by id, in the order given; unknown ids are skipped."""
+
+    def vector_search(
+        self, vector: list[float], k: int, filt: SearchFilter | None = None
+    ) -> list[Hit]:
+        """Nearest chunks by cosine similarity, best first."""

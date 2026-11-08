@@ -1,4 +1,6 @@
-"""Ingestion: HTML -> sections -> store. The same path for fixtures and for EDGAR."""
+"""Ingestion: HTML -> sections -> chunks -> embeddings -> store.
+
+The same path serves the fixture corpus and EDGAR."""
 
 from __future__ import annotations
 
@@ -9,6 +11,8 @@ from app.fixtures.corpus import fixture_filings
 from app.ingest.edgar import EdgarClient
 from app.ingest.parser import parse_filing_html
 from app.models import Filing, Section
+from app.rag.chunking import chunk_section, index_text
+from app.rag.embeddings import Embedder, HashingEmbedder
 from app.store.base import Store
 
 log = logging.getLogger(__name__)
@@ -26,11 +30,13 @@ class IngestError(Exception):
 class IngestResult:
     filing: Filing
     sections: int
+    chunks: int = 0
 
 
 class Ingestor:
-    def __init__(self, store: Store) -> None:
+    def __init__(self, store: Store, embedder: Embedder | None = None) -> None:
         self._store = store
+        self._embedder = embedder or HashingEmbedder()
 
     def ingest_html(self, filing: Filing, html: str) -> IngestResult:
         sections = [s for s in parse_filing_html(html, filing.id) if s.item in KEPT_ITEMS]
@@ -39,13 +45,20 @@ class Ingestor:
                 f"{filing.id}: found {len(sections)} Item sections; the document does not look "
                 "like a 10-K"
             )
-        self.store(filing, sections)
-        log.info("ingested %s (%d sections)", filing.id, len(sections))
-        return IngestResult(filing, len(sections))
+        chunks = self.store(filing, sections)
+        log.info("ingested %s (%d sections, %d chunks)", filing.id, len(sections), chunks)
+        return IngestResult(filing, len(sections), chunks)
 
-    def store(self, filing: Filing, sections: list[Section]) -> None:
-        """Persist a parsed filing. Later milestones extend this (chunks, graph)."""
+    def store(self, filing: Filing, sections: list[Section]) -> int:
         self._store.add_filing(filing, sections)
+        chunks, texts = [], []
+        for section in sections:
+            for chunk in chunk_section(section, filing):
+                chunks.append(chunk)
+                texts.append(index_text(chunk, filing.company, section.title))
+        if chunks:
+            self._store.add_chunks(chunks, texts, self._embedder.embed(texts))
+        return len(chunks)
 
     def ingest_fixtures(self) -> list[IngestResult]:
         return [self.ingest_html(f, html) for f, html in fixture_filings()]

@@ -67,3 +67,54 @@ def ingest(body: IngestRequest, request: Request) -> dict:
     except IngestError as e:
         raise HTTPException(422, str(e)) from e
     return {"ingested": [{"id": r.filing.id, "sections": r.sections} for r in results]}
+
+
+# --- asking questions -------------------------------------------------------------------
+class AskRequest(BaseModel):
+    question: str = Field(..., min_length=3, max_length=500)
+    strategy: str = "naive"
+    tickers: list[str] | None = Field(None, max_length=10)
+    years: list[int] | None = Field(None, max_length=10)
+
+
+@router.get("/strategies")
+def strategies() -> list[dict]:
+    from app.rag.strategies import PIPELINES
+
+    return [
+        {"name": name, "title": cls.title, "description": cls.description}
+        for name, cls in PIPELINES.items()
+    ]
+
+
+@router.post("/ask")
+def ask(body: AskRequest, request: Request) -> dict:
+    from app.llm.base import LlmError
+    from app.models import SearchFilter
+    from app.rag.strategies import PIPELINES
+
+    pipeline_cls = PIPELINES.get(body.strategy)
+    if pipeline_cls is None:
+        raise HTTPException(422, f"unknown strategy: {body.strategy}")
+    filt = None
+    if body.tickers or body.years:
+        filt = SearchFilter(
+            tickers=tuple(t.upper() for t in body.tickers) if body.tickers else None,
+            years=tuple(body.years) if body.years else None,
+        )
+    try:
+        answer = pipeline_cls(_container(request).rag).run(body.question.strip(), filt)
+    except LlmError as e:
+        raise HTTPException(502, f"the model is unavailable: {e}") from e
+    return answer_json(answer)
+
+
+def answer_json(answer) -> dict:
+    data = asdict(answer)
+    data["retrieved"] = [
+        {"chunk_id": h.chunk.id, "ticker": h.chunk.ticker, "fiscal_year": h.chunk.fiscal_year,
+         "item": h.chunk.item, "kind": h.chunk.kind, "score": round(h.score, 4),
+         "source": h.source, "text": h.chunk.text}
+        for h in answer.retrieved
+    ]
+    return data

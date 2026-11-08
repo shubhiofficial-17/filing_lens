@@ -5,7 +5,7 @@ from __future__ import annotations
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
 
-from app.models import Filing, Section
+from app.models import Chunk, Filing, Hit, SearchFilter, Section
 
 SCHEMA = """
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -31,11 +31,30 @@ CREATE TABLE IF NOT EXISTS sections (
     position   int  NOT NULL
 );
 CREATE INDEX IF NOT EXISTS sections_filing ON sections (filing_id, position);
+
+CREATE TABLE IF NOT EXISTS chunks (
+    id          text PRIMARY KEY,
+    section_id  text NOT NULL REFERENCES sections (id) ON DELETE CASCADE,
+    filing_id   text NOT NULL REFERENCES filings (id) ON DELETE CASCADE,
+    ticker      text NOT NULL,
+    fiscal_year int  NOT NULL,
+    item        text NOT NULL,
+    kind        text NOT NULL,
+    position    int  NOT NULL,
+    text        text NOT NULL,
+    index_text  text NOT NULL,
+    embedding   vector({dim}) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS chunks_filter ON chunks (ticker, fiscal_year, item);
+CREATE INDEX IF NOT EXISTS chunks_embedding ON chunks USING hnsw (embedding vector_cosine_ops);
 """
+
+_CHUNK_COLS = "id, section_id, filing_id, ticker, fiscal_year, item, text, kind"
 
 
 class PostgresStore:
-    def __init__(self, url: str, *, min_size: int = 1, max_size: int = 10) -> None:
+    def __init__(self, url: str, *, dim: int = 256, min_size: int = 1, max_size: int = 10) -> None:
+        self._dim = dim
         self._pool = ConnectionPool(url, min_size=min_size, max_size=max_size, open=False)
 
     # --- lifecycle --------------------------------------------------------------------
@@ -53,7 +72,7 @@ class PostgresStore:
         self._pool.close()
 
     def schema(self) -> str:
-        return SCHEMA
+        return SCHEMA.format(dim=self._dim)
 
     def pgvector_version(self) -> str | None:
         with self._pool.connection(timeout=2) as conn:
@@ -111,7 +130,56 @@ class PostgresStore:
         with self._pool.connection() as conn:
             return conn.execute("SELECT count(*) FROM filings").fetchone()[0]
 
-    # --- shared helpers for subclasses -------------------------------------------------
+    # --- chunks ---------------------------------------------------------------------
+    def add_chunks(
+        self, chunks: list[Chunk], index_texts: list[str], vectors: list[list[float]]
+    ) -> None:
+        rows = [
+            (c.id, c.section_id, c.filing_id, c.ticker, c.fiscal_year, c.item, c.kind, n, c.text,
+             text, _vector(vec))
+            for n, (c, text, vec) in enumerate(zip(chunks, index_texts, vectors, strict=True))
+        ]
+        with self._pool.connection() as conn, conn.transaction(), conn.cursor() as cur:
+            cur.executemany(
+                "INSERT INTO chunks (id, section_id, filing_id, ticker, fiscal_year, item, kind,"
+                " position, text, index_text, embedding)"
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::vector)"
+                " ON CONFLICT (id) DO UPDATE SET text = EXCLUDED.text,"
+                " index_text = EXCLUDED.index_text, embedding = EXCLUDED.embedding",
+                rows,
+            )
+
+    def count_chunks(self) -> int:
+        with self._pool.connection() as conn:
+            return conn.execute("SELECT count(*) FROM chunks").fetchone()[0]
+
+    def get_chunks(self, ids: list[str]) -> list[Chunk]:
+        if not ids:
+            return []
+        with self._pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            rows = cur.execute(
+                f"SELECT {_CHUNK_COLS} FROM chunks WHERE id = ANY(%s)", (list(ids),)
+            ).fetchall()
+        by_id = {r["id"]: _chunk(r) for r in rows}
+        return [by_id[i] for i in ids if i in by_id]
+
+    def vector_search(
+        self, vector: list[float], k: int, filt: SearchFilter | None = None
+    ) -> list[Hit]:
+        where, params = _where(filt)
+        params["q"] = _vector(vector)
+        params["k"] = k
+        sql = (
+            f"SELECT {_CHUNK_COLS}, 1 - (embedding <=> %(q)s::vector) AS score FROM chunks"
+            f" WHERE {where} ORDER BY embedding <=> %(q)s::vector, id LIMIT %(k)s"
+        )
+        with self._pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+            # Filtered HNSW scans can stop before finding k matches; scan further when needed.
+            cur.execute("SET LOCAL hnsw.ef_search = 100")
+            rows = cur.execute(sql, params).fetchall()
+        return [Hit(_chunk(r), float(r["score"]), "vector") for r in rows]
+
+    # --- shared helpers --------------------------------------------------------------
     @property
     def pool(self) -> ConnectionPool:
         return self._pool
@@ -128,3 +196,29 @@ def _filing(r: dict) -> Filing:
 def _section(r: dict) -> Section:
     return Section(id=r["id"], filing_id=r["filing_id"], item=r["item"], title=r["title"],
                    text=r["text"])
+
+
+def _chunk(r: dict) -> Chunk:
+    return Chunk(id=r["id"], section_id=r["section_id"], filing_id=r["filing_id"],
+                 ticker=r["ticker"], fiscal_year=r["fiscal_year"], item=r["item"],
+                 text=r["text"], kind=r["kind"])
+
+
+def _vector(vec: list[float]) -> str:
+    return "[" + ",".join(f"{v:.6f}" for v in vec) + "]"
+
+
+def _where(filt: SearchFilter | None) -> tuple[str, dict]:
+    filt = filt or SearchFilter()
+    clauses = ["true"]
+    params: dict = {}
+    if filt.tickers:
+        clauses.append("ticker = ANY(%(tickers)s)")
+        params["tickers"] = list(filt.tickers)
+    if filt.years:
+        clauses.append("fiscal_year = ANY(%(years)s)")
+        params["years"] = list(filt.years)
+    if filt.items:
+        clauses.append("item = ANY(%(items)s)")
+        params["items"] = list(filt.items)
+    return " AND ".join(clauses), params

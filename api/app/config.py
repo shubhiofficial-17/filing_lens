@@ -18,6 +18,21 @@ class Settings(BaseSettings):
     # SEC asks every client to identify itself, e.g. "FilingLens you@example.com".
     edgar_user_agent: str = ""
 
+    # Chat model: any OpenAI-compatible endpoint, usually the LLM Gateway. Unset = demo model.
+    llm_base_url: str | None = None
+    llm_api_key: str = ""
+    llm_model: str = "gpt-4o-mini"
+    # The router sends hard questions here. Unset = always use llm_model.
+    llm_strong_model: str | None = None
+
+    # Embeddings: an OpenAI-compatible /embeddings endpoint. Unset = offline hashing embedder.
+    embeddings_base_url: str | None = None
+    embeddings_api_key: str = ""
+    embeddings_model: str = "text-embedding-3-small"
+    embedding_dim: int = 256
+
+    top_k: int = 5
+
 
 @lru_cache
 def get_settings() -> Settings:
